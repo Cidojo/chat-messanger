@@ -1,0 +1,23 @@
+{
+  "name": "chat-messenger",
+  "version": "1.0.0",
+  "description": "test task",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cidojo/chat-messenger.git"
+  },
+  "author": "Maksim Romanov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cidojo/chat-messenger/issues"
+  },
+  "homepage": "https://github.com/Cidojo/chat-messenger#readme",
+  "dependencies": {
+    "express": "4.16.4",
+    "socket.io": "2.2.0"
+  }
+}
