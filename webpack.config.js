@@ -9,7 +9,7 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         exclude: /(node_modules)/,
-        use: ['babel-loader'],
+        loader: 'babel-loader',
         options: { presets: ['@babel/env'] }
       },
       {
@@ -20,12 +20,12 @@ module.exports = {
   },
   resolve: { extensions: ['*', '.js', '.jsx'] },
   output: {
-    path: path.resolve(__dirname, 'build/'),
-    publicPath: '/build/',
+    path: path.resolve(__dirname, 'public'),
+    publicPath: '/',
     filename: 'bundle.js'
   },
   devServer: {
-    contentBase: path.join(__dirname, 'public/'),
+    contentBase: path.join(__dirname, 'build/'),
     port: 3000,
     publicPath: 'http://localhost:3000/build/',
     hotOnly: true
