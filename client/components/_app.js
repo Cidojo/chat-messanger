@@ -1,5 +1,5 @@
 import React from 'react';
-import './../style/app.css';
+import './_app.css';
 import {hot} from 'react-hot-loader';
 
 
