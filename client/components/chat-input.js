@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './chat-input.css';
 
 class ChatInput extends React.Component {
   constructor(props) {
@@ -12,8 +13,8 @@ class ChatInput extends React.Component {
 
   render() {
       return (
-        <form className="chat-input" onSubmit={this.submitHandler}>
-          <input type="text"
+        <form className="chat-input__container" onSubmit={this.submitHandler}>
+          <input className="chat-input" type="text"
             onChange={this.textChangeHandler}
             value={this.state.chatInput}
             placeholder="Write a message..."

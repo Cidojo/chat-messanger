@@ -3,14 +3,16 @@ const http = require('http');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const path = require('path');
+const config = require('./../webpack.config.js');
+const ClientManager = require('./client-manager');
+const io = require('socket.io');
+const ChatRoom = require('./chat-room');
 
 const app = express();
-const config = require('./../webpack.config.js');
 const compiler = webpack(config);
 const server = http.Server(app);
-const io = require('socket.io');
-
 const socketIo = io(server);
+
 
 // Tell express to use the webpack-dev-middleware and use the webpack.config.js
 // configuration file as a base.
@@ -27,45 +29,67 @@ server.listen(3000, (err) => {
     throw err;
   }
 
+  // eslint-disable-next-line
   console.log(`listening on port 3000`);
 });
 
-io.on('connection', function (client) {
-  client.on('register', handleRegister)
 
-  client.on('join', handleJoin)
+const session = new ClientManager.default();
+const chatRooms = new Set(new ChatRoom(`Global`));
 
-  client.on('leave', handleLeave)
+socketIo.on('connection', (client) => {
+  session.addClient(client);
 
-  client.on('message', handleMessage)
+  client.on('register', (userName) => session.registerClient(client, userName));
 
-  client.on('chatrooms', handleGetChatrooms)
 
-  client.on('availableUsers', handleGetAvailableUsers)
+  client.on('getChatHistory', (name) => // should return array from chatRooms)
 
-  client.on('disconnect', function () {
-    console.log('client disconnect...', client.id)
-    handleDisconnect()
-  })
 
-  client.on('error', function (err) {
-    console.log('received error from client:', client.id)
-    console.log(err)
-  })
-})
-
-socketIo.on('connection', (socket) => {
-  const username = socket.handshake.query.username;
-  console.log(`${username} connected`);
-
-  socket.on('client:message', (data) => {
+  client.on('client:message', (data) => {
+    // eslint-disable-next-line
     console.log(`${data.username}: ${data.message}`);
 
     // message received from client, now broadcast it to everyone else
-    socket.broadcast.emit('server:message', data);
+    client.broadcast.emit('server:message', data);
   });
 
-  socket.on('disconnect', () => {
-    console.log(`${username} disconnected`);
+  client.on('disconnect', function () {
+      session.removeClient(client);
+      // eslint-disable-next-line
+      console.log('client disconnect...', client.id);
+      // handleDisconnect();
   });
+
+  client.on('error', function (err) {
+    // eslint-disable-next-line
+    console.log('received error from client:', client.id);
+    // eslint-disable-next-line
+    console.log(err);
+  })
 });
+
+
+// io.on('connection', function (client) {
+//   client.on('register', handleRegister)
+//
+//   client.on('join', handleJoin)
+//
+//   client.on('leave', handleLeave)
+//
+//   client.on('message', handleMessage)
+//
+//   client.on('chatrooms', handleGetChatrooms)
+//
+//   client.on('availableUsers', handleGetAvailableUsers)
+//
+//   client.on('disconnect', function () {
+//     console.log('client disconnect...', client.id)
+//     handleDisconnect()
+//   })
+//
+//   client.on('error', function (err) {
+//     console.log('received error from client:', client.id)
+//     console.log(err)
+//   })
+// })

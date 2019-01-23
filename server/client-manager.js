@@ -1,9 +1,23 @@
-export default class ClientManager {
+class ClientManager {
   constructor() {
     this.clients = new Map();
   }
+
+  addClient(client) {
+    this.clients.set(client.id, {client})
+  }
+
+  registerClient(client, user) {
+    this.clients.set(client.id, {client, user})
+  }
+
+  removeClient(client) {
+    this.clients.delete(client.id)
+  }
+
 }
 
+module.exports.default = ClientManager;
 
 // const userTemplates = require('../config/users')
 
@@ -11,17 +25,11 @@ export default class ClientManager {
   // mapping of all connected clients
 //   const clients = new Map()
 //
-//   function addClient(client) {
-//     clients.set(client.id, {client})
-//   }
+
 //
-//   function registerClient(client, user) {
-//     clients.set(client.id, {client, user})
-//   }
+
 //
-//   function removeClient(client) {
-//     clients.delete(client.id)
-//   }
+
 //
 //   function getAvailableUsers() {
 //     const usersTaken = new Set(
