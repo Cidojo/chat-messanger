@@ -1,15 +1,21 @@
 import React from 'react';
 import ChatRoom from './chat-room';
 import './username-form.css';
+import clientSocket from './../client-socket';
+
 
 class UsernameForm extends React.Component {
   constructor(props) {
     super(props)
 
-    // setting initial username of empty string
-    this.state = {username: ''};
+    this.state = {
+      username: null,
+      submittet: false,
+      client: clientSocket(),
+      chatrooms: null
+    }
 
-    // fixing 'this' to handlers
+    // fix 'this' to handlers
     this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
     this.usernameSubmitHandler = this.usernameSubmitHandler.bind(this);
   }
@@ -18,7 +24,7 @@ class UsernameForm extends React.Component {
     if (this.state.submitted) {
       // Form was submitted, now join user to a default chat
       return (
-        <ChatRoom username={this.state.username} chatRoomName={`Global`} />
+        <ChatRoom state={this.state} />
       );
     }
 
@@ -38,11 +44,21 @@ class UsernameForm extends React.Component {
 
   usernameChangeHandler(event) {
     this.setState({username: event.target.value});
+    // console.log(this.state.username);
   }
 
   usernameSubmitHandler(event) {
     event.preventDefault();
-    this.setState({submitted: true, username: this.state.username});
+
+    this.state.client.registerQuery(this.state.username);
+    this.state.client.registerHandler((success) => {
+      if (success) {
+        this.setState({submitted: true});
+      } else {
+        alert('This name is taken, please choose another name')
+      }
+
+    });
   }
 }
 

@@ -3,31 +3,28 @@ import PropTypes from 'prop-types';
 import Messages from './messages';
 import ChatInput from './chat-input';
 import UsersList from './users-list';
-import config from './../config.js';
-import io from 'socket.io-client';
+import roomSocket from './../room-socket';
 import './chat-room.css';
 
 class ChatRoom extends React.Component {
-  constructor(props, name) {
+  constructor(props) {
     super(props);
 
     // set the initial state of messages so that it is not undefined on load
     this.state = {
+      name: this.props.state.username, // this.socket.username
       messages: [],
-      name
+      members: [],
+      socket: roomSocket(this.props.state.username)
     };
 
-    // Connect to the server
-    this.socket = io(config.api).connect();
-
+    this.state.socket.join(this.name);
     // Listen for messages from the server
-    this.socket.on('server:message', (message) => {
-      this.addMessage(message);
-    });
+    this.state.socket.onMessageReceived(this.addMessage);
 
-    this.socket.emit('getHistory', (chatHistory) => {
-      this.setState({chatHistory});
-    });
+    // this.state.socket.emit('getHistory', (chatHistory) => {
+      // this.setState({chatHistory});
+    // });
 
     this.sendHandler = this.sendHandler.bind(this);
     this.addMessage = this.addMessage.bind(this);
@@ -36,7 +33,7 @@ class ChatRoom extends React.Component {
   render() {
     return (
       <div className="chat-room">
-        <h3 className="chat-room__title">Chat Room: this.state.name</h3>
+        <h3 className="chat-room__title">Chat Room: {this.state.name}</h3>
         <div className="chat-room__container">
           <Messages messages={this.state.messages} />
           <ChatInput onSend={this.sendHandler} />
@@ -49,12 +46,11 @@ class ChatRoom extends React.Component {
   sendHandler(message) {
     const messageObject = {
       date: new Date().toLocaleTimeString(),
-      username: this.props.username,
       message
     };
 
     // Emit the message to the server
-    this.socket.emit('client:message', messageObject);
+    this.state.socket.onMessageSend(messageObject, this.state.name);
 
     messageObject.fromMe = true;
     this.addMessage(messageObject);
@@ -69,8 +65,7 @@ class ChatRoom extends React.Component {
 }
 
 ChatRoom.propTypes = {
-  username: PropTypes.string,
-  chatHistory: PropTypes.any
+  state: PropTypes.any
 }
 
 export default ChatRoom;

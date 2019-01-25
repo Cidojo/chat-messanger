@@ -23,24 +23,25 @@ class ChatInput extends React.Component {
       );
   }
 
-  textChangeHandler(event)  {
-    this.setState({chatInput: event.target.value});
+  textChangeHandler(evt)  {
+    this.setState({chatInput: evt.target.value});
   }
 
-  submitHandler(event) {
+  submitHandler(evt) {
     // Stop the form from refreshing the page on submit
-    event.preventDefault();
+    evt.preventDefault();
 
     // Call the onSend callback with the chatInput message
-    this.props.onSend(this.state.chatInput);
-
-    // Clear the input box
-    this.setState({chatInput: ''});
+    if (this.state.chatInput) {
+      this.props.onSubmit(this.state.chatInput);
+      // Clear the input box
+      this.setState({chatInput: ''});
+    }
   }
 }
 
 ChatInput.propTypes = {
-  onSend: PropTypes.func
+  onSubmit: PropTypes.func
 }
 
 export default ChatInput;
