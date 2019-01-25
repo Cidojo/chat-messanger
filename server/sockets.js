@@ -1,9 +1,9 @@
-var io = require('socket.io');
+const io = require('socket.io');
 
-exports.initialize = (server) => {
-  io = io.listen(server);
+const initialize = (server) => {
+  const socketIo = io.listen(server);
 
-  io.sockets.on(`connection`, (socket) => {
+  socketIo.sockets.on(`connection`, (socket) => {
     socket.emit(JSON.stringify({
         type:`serverMessage`,
         message: `Welcome to Cidojo's chat room!`
@@ -19,3 +19,5 @@ exports.initialize = (server) => {
       });
     });
 };
+
+module.exports = initialize;
