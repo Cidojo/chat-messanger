@@ -1,57 +1,29 @@
-export default class ClientManager {
+class ClientManager {
   constructor() {
     this.clients = new Map();
+
+    this.registerClient = this.registerClient.bind(this);
+    this.addClient = this.addClient.bind(this);
   }
+
+  addClient(client) {
+    this.clients.set(client.id, {client})
+  }
+
+  registerClient(client, username) {
+    const usernameAvailiability = !([...this.clients.values()].map((c) => c.username).includes(username));
+
+    if (usernameAvailiability) {
+      this.clients.get(client.id).username =  username;
+    }
+
+    return usernameAvailiability;
+  }
+
+  removeClient(client) {
+    this.clients.delete(client.id)
+  }
+
 }
 
-
-// const userTemplates = require('../config/users')
-
-// module.exports = function () {
-  // mapping of all connected clients
-//   const clients = new Map()
-//
-//   function addClient(client) {
-//     clients.set(client.id, {client})
-//   }
-//
-//   function registerClient(client, user) {
-//     clients.set(client.id, {client, user})
-//   }
-//
-//   function removeClient(client) {
-//     clients.delete(client.id)
-//   }
-//
-//   function getAvailableUsers() {
-//     const usersTaken = new Set(
-//       Array.from(clients.values())
-//         .filter(c => c.user)
-//         .map(c => c.user.name)
-//     )
-//     return userTemplates
-//       .filter(u => !usersTaken.has(u.name))
-//   }
-//
-//   function isUserAvailable(userName) {
-//     return getAvailableUsers().some(u => u.name === userName)
-//   }
-//
-//   function getUserByName(userName) {
-//     return userTemplates.find(u => u.name === userName)
-//   }
-//
-//   function getUserByClientId(clientId) {
-//     return (clients.get(clientId) || {}).user
-//   }
-//
-//   return {
-//     addClient,
-//     registerClient,
-//     removeClient,
-//     getAvailableUsers,
-//     isUserAvailable,
-//     getUserByName,
-//     getUserByClientId
-//   }
-// }
+module.exports = ClientManager;

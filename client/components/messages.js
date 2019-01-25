@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Message from './message';
+import './messages.css';
 
 class Messages extends React.Component {
   constructor(props) {
@@ -13,6 +14,7 @@ class Messages extends React.Component {
           return (
             <Message
               key={i}
+              date={message.date}
               username={message.username}
               message={message.message}
               fromMe={message.fromMe} />
