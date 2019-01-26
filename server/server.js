@@ -34,9 +34,20 @@ app.use(webpackDevMiddleware(compiler, {
 app.use(express.static(publicPath));
 
 io.on(`connection`, (socket) => {
-  console.log(`server: user connected...`);
+  console.log(`server: user connected...`, `User_ID: ${socket.id}`);
+
+  socket.emit(`message`, {
+    from: `Server`,
+    to: `Client`,
+    body: `Hello from server`,
+    createdAt: new Date().toLocaleTimeString()
+  });
+
+  socket.on(`submitMessage`, (message) => {
+    io.emit(`message`, message);
+  });
 
   socket.on(`disconnect`, () => {
-    console.log(`server: user has disconnected...`);
+    console.log(`server: user has disconnected...`, `User_ID: ${socket.id}`);
   });
 });

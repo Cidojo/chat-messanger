@@ -2,7 +2,9 @@ import React from 'react';
 import './username-form.css';
 import initSocketCli from './../socket';
 
-initSocketCli();
+const socket = initSocketCli;
+
+window.socket = socket(); // debugger for
 
 class UsernameForm extends React.Component {
   constructor(props) {
