@@ -1,6 +1,8 @@
 import React from 'react';
 import './username-form.css';
+import initSocketCli from './../socket';
 
+initSocketCli();
 
 class UsernameForm extends React.Component {
   constructor(props) {
