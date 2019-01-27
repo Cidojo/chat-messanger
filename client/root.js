@@ -9,7 +9,8 @@ const Root = () => {
       <div>
         <Switch>
           <Route path="/" component={UsernameForm} exact={true} />
-          <Route path="/chatroom" component={ChatRoom} />
+          <Route path="/chatroom/:name" component={ChatRoom} exact={true}/>
+          <Route path="/chatroom/room" component={ChatRoom} exact={true}/>
         </Switch>
       </div>
     </Router>

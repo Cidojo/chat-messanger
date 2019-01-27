@@ -8,13 +8,16 @@ const config = require('./../webpack.config.js');
 const compiler = webpack(config);
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const messageMananger = require('./utils/message');
+const ClientManager = require('./client-manager');
 
 const app = express();
 const server = http.createServer(app);
 const publicPath = path.join(__dirname, `./../public`);
 const io = socketIO(server);
+const clientManager = new ClientManager();
 
 const port = process.env.PORT || 3000;
+
 
 server.listen(port, (err) => {
   if (err) {
@@ -37,32 +40,24 @@ app.get(`*`, (req, res) => {
   res.sendFile(path.join(publicPath, `index.html`));
 });
 
+
 io.on(`connection`, (socket) => {
-  console.log(`server: user connected...`, `User_ID: ${socket.id}`); // eslint-disable-line no-console
+  console.log(`user connected`, socket.id); // eslint-disable-line
 
-  socket.broadcast.emit(`message`, {
-    from: `server`,
-    body: `new user has joined the chat`,
-    createdAt: new Date().getTime(),
-    type: `systemMessage`
+  clientManager.register(socket);
+
+  socket.on(`registerName`, (name) => {
+    clientManager.registerName(socket.id, name);
+    socket.emit(`onSuccessNameRegister`, name);
   });
 
-  socket.emit(`message`, {
-    from: `server`,
-    body: `welcome to the chat`,
-    createdAt: new Date().getTime(),
-    type: `systemMessage`
-  });
-
-  socket.on(`submitMessage`, (message) => {
-    socket.broadcast.emit(`message`, {
-      from: message.from,
-      text: message.body,
-      createdAt: new Date().getTime()
-    });
+  socket.on(`joinMeToRoom`, (room) => {
+    socket.join(room);
+    console.log(socket.room);
   });
 
   socket.on(`disconnect`, () => {
-    console.log(`server: user has disconnected...`, `User_ID: ${socket.id}`);
+    clientManager.removeClient(socket);
+    console.log(`server: user has disconnected...`, `User_ID: ${socket.id}`); // eslint-disable-line
   });
 });

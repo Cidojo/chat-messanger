@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import './username-form.css';
 import initSocketCli from './../socket';
 import {withRouter} from 'react-router-dom';
-const socket = initSocketCli;
+const socket = initSocketCli();
 
-window.socket = socket(); // debugger for
+window.socket = socket.client; // debugger for
 
 class UsernameForm extends React.Component {
   constructor(props) {
@@ -13,8 +13,7 @@ class UsernameForm extends React.Component {
 
     this.state = {
       username: null,
-      submittet: false,
-      chatrooms: null
+      submitted: false,
     }
 
     this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
@@ -30,6 +29,7 @@ class UsernameForm extends React.Component {
           name="username"
           type="text"
           placeholder="Enter your nickname..."
+          onChange={this.usernameChangeHandler}
           required />
         <button className="btn username-form__submit" type="submit">Join</button>
       </form>
@@ -43,11 +43,14 @@ class UsernameForm extends React.Component {
   usernameSubmitHandler(evt) {
     evt.preventDefault();
 
+    socket.registerNameHandler(this.state.username);
+    socket.joinHandler(this.state.username);
+
     this.setState({
       submitted: true
     });
 
-    this.props.history.push('/chatroom');
+    this.props.history.push(`/chatroom/${this.state.username}`);
   }
 }
 

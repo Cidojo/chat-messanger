@@ -3,26 +3,23 @@ const socketCli = require('socket.io-client');
 const initSocketCli = () => {
   const client = socketCli();
 
-  client.on(`connect`, () => {
-    console.log(`client: connected to server...`);
-    client.emit(`submit`, {
-      from: `client`,
-      to: `server`,
-      body: `Hey Hey Server`,
-      createdAt: new Date().toLocaleTimeString()
-    });
+  client.on(`onSuccessNameRegister`, (name) => {
+    console.log(name);
   });
 
-  client.on(`message`, (message) => {
-    console.log(`client: new message received:`, message);
-  });
+  const registerNameHandler = (name) => {
+    client.emit(`registerName`, name);
+  }
 
-  client.on(`disconnect`, () => {
-    console.log(`client: disconnected...`);
-  });
+  const joinHandler = (room) => {
+    client.emit(`joinMeToRoom`, room);
+  }
 
-
-  return client;
+  return {
+    client,
+    registerNameHandler,
+    joinHandler
+  }
 }
 
 export default initSocketCli;

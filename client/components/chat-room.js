@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import Messages from './messages';
-// import ChatInput from './chat-input';
-// import UsersList from './users-list';
+import Messages from './messages';
+import ChatInput from './chat-input';
+import UsersList from './users-list';
 // import roomSocket from './../room-socket';
 import './chat-room.css';
 
@@ -35,8 +35,10 @@ class ChatRoom extends React.Component {
       <div className="chat-room">
         <h3 className="chat-room__title">Chat Room: {this.state.name}</h3>
         <div className="chat-room__container">
-          <p>SSS</p>
+          <Messages messages={this.state.messages} />
+          <ChatInput />
         </div>
+        <UsersList />
       </div>
     );
   }
