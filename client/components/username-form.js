@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './username-form.css';
 import initSocketCli from './../socket';
-
+import {withRouter} from 'react-router-dom';
 const socket = initSocketCli;
 
 window.socket = socket(); // debugger for
@@ -16,30 +17,42 @@ class UsernameForm extends React.Component {
       chatrooms: null
     }
 
-    // this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
-    // this.usernameSubmitHandler = this.usernameSubmitHandler.bind(this);
+    this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
+    this.usernameSubmitHandler = this.usernameSubmitHandler.bind(this);
   }
 
   render() {
-    if (this.state.submitted) {
-      return (
-        // <ChatRoom state={this.state} />
-        <p></p>
-      );
-    }
-
     return (
-      <form className="username-form">
+      <form className="username-form" onSubmit={this.usernameSubmitHandler}>
         <h2 className="username-form__title">{`Welcome to Dojo's chat-messenger`}</h2>
-        <p>Enter your name down below and click join button to join main chat</p>
+        <p>Enter your name down below and click join button to join a chat</p>
         <input className="username-form__input"
+          name="username"
           type="text"
           placeholder="Enter your nickname..."
-        required />
+          required />
         <button className="btn username-form__submit" type="submit">Join</button>
       </form>
     );
   }
+
+  usernameChangeHandler(event) {
+    this.setState({username: event.target.value});
+  }
+
+  usernameSubmitHandler(evt) {
+    evt.preventDefault();
+
+    this.setState({
+      submitted: true
+    });
+
+    this.props.history.push('/chatroom');
+  }
 }
 
-export default UsernameForm;
+UsernameForm.propTypes = {
+  history: PropTypes.any
+}
+
+export default withRouter(UsernameForm);

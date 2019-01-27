@@ -7,7 +7,7 @@ const webpack = require('webpack');
 const config = require('./../webpack.config.js');
 const compiler = webpack(config);
 const webpackDevMiddleware = require('webpack-dev-middleware');
-
+const messageMananger = require('./utils/message');
 
 const app = express();
 const server = http.createServer(app);
@@ -33,18 +33,33 @@ app.use(webpackDevMiddleware(compiler, {
 // routing
 app.use(express.static(publicPath));
 
+app.get(`*`, (req, res) => {
+  res.sendFile(path.join(publicPath, `index.html`));
+});
+
 io.on(`connection`, (socket) => {
-  console.log(`server: user connected...`, `User_ID: ${socket.id}`);
+  console.log(`server: user connected...`, `User_ID: ${socket.id}`); // eslint-disable-line no-console
+
+  socket.broadcast.emit(`message`, {
+    from: `server`,
+    body: `new user has joined the chat`,
+    createdAt: new Date().getTime(),
+    type: `systemMessage`
+  });
 
   socket.emit(`message`, {
-    from: `Server`,
-    to: `Client`,
-    body: `Hello from server`,
-    createdAt: new Date().toLocaleTimeString()
+    from: `server`,
+    body: `welcome to the chat`,
+    createdAt: new Date().getTime(),
+    type: `systemMessage`
   });
 
   socket.on(`submitMessage`, (message) => {
-    io.emit(`message`, message);
+    socket.broadcast.emit(`message`, {
+      from: message.from,
+      text: message.body,
+      createdAt: new Date().getTime()
+    });
   });
 
   socket.on(`disconnect`, () => {
