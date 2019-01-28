@@ -7,7 +7,7 @@ const webpack = require('webpack');
 const config = require('./../webpack.config.js');
 const compiler = webpack(config);
 const webpackDevMiddleware = require('webpack-dev-middleware');
-const messageMananger = require('./utils/message');
+const createMessage = require('./utils/create-message');
 const ClientManager = require('./client-manager');
 
 const app = express();
@@ -51,9 +51,12 @@ io.on(`connection`, (socket) => {
     socket.emit(`onSuccessNameRegister`, name);
   });
 
-  socket.on(`joinMeToRoom`, (room) => {
-    socket.join(room);
-    console.log(socket.room);
+  // socket.on(`joinMeToRoom`, (room) => {
+  //   socket.join(room);
+  // });
+
+  socket.on(`createMessage`, (from, text) => {
+    socket.emit(`newMessage`, createMessage(from, text));
   });
 
   socket.on(`disconnect`, () => {

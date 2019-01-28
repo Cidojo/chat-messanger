@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import './username-form.css';
 import initSocketCli from './../socket';
 import {withRouter} from 'react-router-dom';
-const socket = initSocketCli();
+const socketManager = initSocketCli();
 
-window.socket = socket.client; // debugger for
+window.socket = socketManager.client; // debugger for
 
 class UsernameForm extends React.Component {
   constructor(props) {
@@ -14,6 +14,7 @@ class UsernameForm extends React.Component {
     this.state = {
       username: null,
       submitted: false,
+      socketManager
     }
 
     this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
@@ -43,8 +44,8 @@ class UsernameForm extends React.Component {
   usernameSubmitHandler(evt) {
     evt.preventDefault();
 
-    socket.registerNameHandler(this.state.username);
-    socket.joinHandler(this.state.username);
+    socketManager.registerNameHandler(this.state.username);
+    socketManager.joinHandler(this.state.username);
 
     this.setState({
       submitted: true

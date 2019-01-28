@@ -15,10 +15,20 @@ const initSocketCli = () => {
     client.emit(`joinMeToRoom`, room);
   }
 
+  const createMessageHandler = (from, text) => {
+    client.emit(`createMessage`, from, text);
+  };
+
+  const onMessageReceived = (cb) => {
+    client.on(`newMessage`, cb);
+  }
+
   return {
     client,
     registerNameHandler,
-    joinHandler
+    joinHandler,
+    createMessageHandler,
+    onMessageReceived
   }
 }
 

@@ -33,7 +33,7 @@ class ChatInput extends React.Component {
 
     // Call the onSend callback with the chatInput message
     if (this.state.chatInput) {
-      this.props.onSubmit(this.state.chatInput);
+      this.props.onSend(this.state.chatInput);
       // Clear the input box
       this.setState({chatInput: ''});
     }
@@ -41,7 +41,7 @@ class ChatInput extends React.Component {
 }
 
 ChatInput.propTypes = {
-  onSubmit: PropTypes.func
+  onSend: PropTypes.func
 }
 
 export default ChatInput;
