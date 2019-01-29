@@ -1,7 +1,7 @@
-const socketCli = require('socket.io-client');
+const socketClient = require('socket.io-client');
 
 const initSocketCli = () => {
-  const client = socketCli();
+  const client = socketClient();
 
   const registerName = (name, cb) => {
     client.emit(`register`, name, cb);
@@ -20,6 +20,7 @@ const initSocketCli = () => {
   }
 
   return {
+    client,
     registerName,
     debugGetAllClients,
     debugGetRegisteredClients,

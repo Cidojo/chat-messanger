@@ -10,7 +10,7 @@ const webpack = require('webpack'),
       webpackDevMiddleware = require('webpack-dev-middleware');
 
 const app = express(),
-      server = http.createServer(app),
+      server = http.Server(app),
       publicPath = path.join(__dirname, `./../public`),
       io = socketIO(server),
       port = process.env.PORT || 3000;
@@ -58,18 +58,18 @@ io.on(`connection`, (client) => {
   });
 
   client.on(`debug:getRegisteredClients`, (cb) => {
-    cb([...clientManager.registeredClients]);
+    cb([...clientManager.registeredClients.values()]);
   });
 
 
   client.on(`disconnect`, () => {
     clientManager.delete(client.id);
 
-    io.broadcast.emit(`debug:update`, {
+    io.emit(`debug:update`, {
       allClients: [...clientManager.clients.values()],
-      registeredClients: [...clientManager.registeredClients]
+      registeredClients: [...clientManager.registeredClients.values()]
     });
 
-    console.log(`${socket.id} has disconnected...`); // eslint-disable-line
+    console.log(`${client.id} has disconnected...`); // eslint-disable-line
   });
 });

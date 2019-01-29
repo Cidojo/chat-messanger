@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 import './login.css';
 import initSocketCli from './../socket-cli.js';
 
-const socketCli = initSocketCli();
-
 class Login extends React.Component {
   constructor(props) {
     super(props)
@@ -14,6 +12,7 @@ class Login extends React.Component {
       username: null,
       registered: false,
       nameAvailiable: true,
+      socketCli: initSocketCli()
     }
 
     this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
@@ -22,11 +21,12 @@ class Login extends React.Component {
 
   render() {
     if (this.state.registered) {
+      debugger
       return <Redirect to={{
         pathname: `/chatroom`,
         state: {
           username: this.state.username,
-          socketCli
+          socketCli: this.state.socketCli.client
         }
       }} />;
     }
@@ -69,7 +69,7 @@ class Login extends React.Component {
       }
     }
 
-  socketCli.registerName(this.state.username, getRegisterState);
+    this.state.socketCli.registerName(this.state.username, getRegisterState.bind(this));
 
   }
 }
