@@ -6,7 +6,7 @@ class DebugState extends React.Component {
     super(props);
     this.state = {
       username: this.props.location.state.username,
-      socket: this.props.location.state.username
+      socketCli: this.props.location.state.socketCli
     }
  }
 
@@ -14,9 +14,23 @@ render() {
   return (
     <div className="chat-room">
       <h3 className="chat-room__title">Debugging:</h3>
-      <ul>
-        <li></li>
-        <li></li>
+      <ul>All Clients online:
+        {this.state.socketCli.map((client, k) => {
+          return (
+            <li key={k}>
+              ID: {client.id} , NAME: {client.username}
+            </li>
+          );
+        })}
+      </ul>
+      <ul>Registered Clients online:
+        {this.state.socketCli.map((client, k) => {
+          return (
+            <li key={k}>
+              ID: {client.id} , NAME: {client.username}
+            </li>
+          );
+        })}
       </ul>
     </div>
     );
