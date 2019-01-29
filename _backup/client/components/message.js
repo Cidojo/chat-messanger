@@ -5,17 +5,20 @@ import './message.css';
 class Message extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      message: this.props.message
+    }
   }
 
   render() {
       return (
         <li className="message">
           <span className={`message__username`}>
-            {[this.props.createdAt, this.props.username].join(`---`)}:&nbsp;
+            {[this.state.message.createdAt, this.state.message.from].join(`---`)}:&nbsp;
           </span>
 
           <span className="message__body">
-            {this.props.body}
+            {this.state.message.text}
           </span>
         </li>
       );
@@ -23,9 +26,7 @@ class Message extends React.Component {
   }
 
   Message.propTypes = {
-    createdAt: PropTypes.string,
-    body: PropTypes.string,
-    username: PropTypes.string,
+    message: PropTypes.any,
   }
 
   export default Message;

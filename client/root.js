@@ -1,16 +1,16 @@
 import React from 'react';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
-import UsernameForm from './components/username-form';
-import ChatRoom from './components/chat-room';
+import Login from './components/login';
+import DebugState from './debug-state';
+// import ChatRoom from './components/chat-room';
 
 const Root = () => {
   return (
     <Router>
       <div>
         <Switch>
-          <Route path="/" component={UsernameForm} exact={true} />
-          <Route path="/chatroom/:name" component={ChatRoom} exact={true}/>
-          <Route path="/chatroom/room" component={ChatRoom} exact={true}/>
+          <Route path="/" component={Login} exact={true} />
+          <Route path="/chatroom" component={DebugState} />
         </Switch>
       </div>
     </Router>

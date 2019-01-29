@@ -1,22 +1,19 @@
-const path = require('path');
-const http = require('http');
-const express = require('express');
-const socketIO = require('socket.io');
+const path = require('path'),
+      http = require('http'),
+      express = require('express'),
+      ClientManager = require('./client-manager'),
+      socketIO = require('socket.io');
 
-const webpack = require('webpack');
-const config = require('./../webpack.config.js');
-const compiler = webpack(config);
-const webpackDevMiddleware = require('webpack-dev-middleware');
-const createMessage = require('./utils/create-message');
-const ClientManager = require('./client-manager');
+const webpack = require('webpack'),
+      config = require('./../webpack.config.js'),
+      compiler = webpack(config),
+      webpackDevMiddleware = require('webpack-dev-middleware');
 
-const app = express();
-const server = http.createServer(app);
-const publicPath = path.join(__dirname, `./../public`);
-const io = socketIO(server);
-const clientManager = new ClientManager();
-
-const port = process.env.PORT || 3000;
+const app = express(),
+      server = http.createServer(app),
+      publicPath = path.join(__dirname, `./../public`),
+      io = socketIO(server),
+      port = process.env.PORT || 3000;
 
 
 server.listen(port, (err) => {
@@ -40,27 +37,39 @@ app.get(`*`, (req, res) => {
   res.sendFile(path.join(publicPath, `index.html`));
 });
 
+const clientManager = new ClientManager;
 
-io.on(`connection`, (socket) => {
-  console.log(`user connected`, socket.id); // eslint-disable-line
+io.on(`connection`, (client) => {
+  console.log(`${client.id} connected...`); // eslint-disable-line
 
-  clientManager.register(socket);
+  clientManager.add(client);
 
-  socket.on(`registerName`, (name) => {
-    clientManager.registerName(socket.id, name);
-    socket.emit(`onSuccessNameRegister`, name);
+  client.on(`register`, (name, cb) => {
+    try {
+      clientManager.add(client, name);
+      cb(true);
+    } catch (e) {
+      cb(false);
+    }
+  })
+
+  client.on(`debug:getAllClients`, (cb) => {
+    cb([...clientManager.clients.values()]);
   });
 
-  // socket.on(`joinMeToRoom`, (room) => {
-  //   socket.join(room);
-  // });
-
-  socket.on(`createMessage`, (from, text) => {
-    socket.emit(`newMessage`, createMessage(from, text));
+  client.on(`debug:getRegisteredClients`, (cb) => {
+    cb([...clientManager.registeredClients]);
   });
 
-  socket.on(`disconnect`, () => {
-    clientManager.removeClient(socket);
-    console.log(`server: user has disconnected...`, `User_ID: ${socket.id}`); // eslint-disable-line
+
+  client.on(`disconnect`, () => {
+    clientManager.delete(client.id);
+
+    io.broadcast.emit(`debug:update`, {
+      allClients: [...clientManager.clients.values()],
+      registeredClients: [...clientManager.registeredClients]
+    });
+
+    console.log(`${socket.id} has disconnected...`); // eslint-disable-line
   });
 });
