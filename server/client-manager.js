@@ -1,7 +1,10 @@
 class ClientManager {
   constructor() {
-    this.clients = new Map();
+    this.allClients = new Map();
     this.registeredClients = new Map();
+
+    this.isNameTaken = this.isNameTaken.bind(this);
+    this.register = this.register.bind(this);
   }
 
   add(client) {
@@ -10,33 +13,51 @@ class ClientManager {
     } catch (e) {
       return e;
     }
-    this.clients.set(client.id, {client});
+    this.allClients.set(client.id, {client});
   }
 
   delete(id) {
-    this.clients.delete(id);
+    this.allClients.delete(id);
+    this.registeredClients.delete(id);
   }
 
   register(id, name) {
     if (this.isNameTaken(name)) {
       throw new Error(`Name taken`);
     }
-
-    this.clients.get(id).name = name;
-    this.registeredClients.set(id, this.clients.get(id));
+    this.allClients.get(id).name = name;
+    this.registeredClients.set(id, this.allClients.get(id));
   }
 
   isNameTaken(name) {
-    const clients = this.clients.values();
+    const clients = this.allClients.values();
 
 // using for loop to quit func in proper time ( no need to iterate throught all map if found match )
-    for (let i = 0; i < this.clients.size; i++) {
+    for (let i = 0; i < this.allClients.size; i++) {
       if (clients.next().value.name === name) {
         return true;
       }
     }
 
     return false;
+  }
+
+  getAllClients() {
+    return [...this.allClients.values()].map((client) => {
+      return {
+        id: client.client.id,
+        username: client.name || `not registered`
+      }
+    });
+  }
+
+  getRegisteredClients() {
+    return [...this.registeredClients.values()].map((client) => {
+      return {
+        id: client.client.id,
+        username: client.name
+      }
+    });
   }
 }
 

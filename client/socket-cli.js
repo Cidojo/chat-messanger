@@ -20,7 +20,6 @@ const initSocketCli = () => {
   }
 
   return {
-    client,
     registerName,
     debugGetAllClients,
     debugGetRegisteredClients,

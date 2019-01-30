@@ -5,21 +5,16 @@ class DebugState extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: this.props.location.state.username,
-      socketCli: this.props.location.state.socketCli,
-      clientLists: {
-        all: [],
-        registered: []
-      }
+      username: this.props.location.username,
+      clientsAll: [],
+      clientsRegistered: [],
+      socketCli: this.props.location.socketCli
     }
 
-    // this.socketCli.debugGetAllClients(this.onUpdateUsers.bind(this));
-    // this.socketCli.debugGetRegisteredClients(this.onGetRegisteredClients.bind(this));
-    // this.socketCli.debugOnUpdate(this.onUpdate.bind(this));
-
-    // this.socketCli.debugGetAllClients(console.log);
-    // this.socketCli.debugGetRegisteredClients(console.log);
-    // this.socketCli.debugOnUpdate(console.log);
+    // this.state.socketCli = this.props.location.socketCli;
+    this.state.socketCli.debugGetAllClients(this.onGetAllClients.bind(this));
+    this.state.socketCli.debugGetRegisteredClients(this.onGetRegisteredClients.bind(this));
+    this.state.socketCli.debugOnUpdate(this.onUpdateUsers.bind(this));
  }
 
 render() {
@@ -27,7 +22,7 @@ render() {
     <div className="chat-room">
       <h3 className="chat-room__title">Debugging:</h3>
       <ul>All Clients online:
-        {this.state.clientLists.all.map((client, k) => {
+        {this.state.clientsAll.map((client, k) => {
           return (
             <li key={k}>
               ID: {client.id} , NAME: {client.username}
@@ -36,7 +31,7 @@ render() {
         })}
       </ul>
       <ul>Registered Clients online:
-        {this.state.clientLists.registered.map((client, k) => {
+        {this.state.clientsRegistered.map((client, k) => {
           return (
             <li key={k}>
               ID: {client.id} , NAME: {client.username}
@@ -50,26 +45,20 @@ render() {
 
   onUpdateUsers(all, registered) {
     this.setState({
-      debug: {
-        all,
-        registered
-      }
+      clientsAll: all,
+      clientsRegistered: registered
     });
   }
 
   onGetAllClients(all) {
     this.setState({
-      debug: {
-        all
-      }
+      clientsAll: all
     });
   }
 
   onGetRegisteredClients(registered) {
     this.setState({
-      debug: {
-        registered
-      }
+      clientsRegistered: registered
     });
   }
 }

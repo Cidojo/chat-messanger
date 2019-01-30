@@ -42,33 +42,35 @@ const clientManager = new ClientManager;
 io.on(`connection`, (client) => {
   console.log(`${client.id} connected...`); // eslint-disable-line
 
+  const updateListsEvent = () => {
+    io.emit(`debug:update`, clientManager.getAllClients(), clientManager.getRegisteredClients());
+  }
+
   clientManager.add(client);
+  updateListsEvent();
 
   client.on(`register`, (name, cb) => {
     try {
-      clientManager.add(client, name);
+      clientManager.register(client.id, name);
       cb(true);
     } catch (e) {
       cb(false);
     }
+    updateListsEvent();
   })
 
   client.on(`debug:getAllClients`, (cb) => {
-    cb([...clientManager.clients.values()]);
+    cb(clientManager.getAllClients());
   });
 
   client.on(`debug:getRegisteredClients`, (cb) => {
-    cb([...clientManager.registeredClients.values()]);
+    cb(clientManager.getRegisteredClients());
   });
 
 
   client.on(`disconnect`, () => {
     clientManager.delete(client.id);
-
-    io.emit(`debug:update`, {
-      allClients: [...clientManager.clients.values()],
-      registeredClients: [...clientManager.registeredClients.values()]
-    });
+    updateListsEvent();
 
     console.log(`${client.id} has disconnected...`); // eslint-disable-line
   });

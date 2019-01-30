@@ -12,8 +12,9 @@ class Login extends React.Component {
       username: null,
       registered: false,
       nameAvailiable: true,
-      socketCli: initSocketCli()
     }
+
+    this.socketCli = initSocketCli();
 
     this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
     this.usernameSubmitHandler = this.usernameSubmitHandler.bind(this);
@@ -21,13 +22,10 @@ class Login extends React.Component {
 
   render() {
     if (this.state.registered) {
-      debugger
       return <Redirect to={{
-        pathname: `/chatroom`,
-        state: {
+          pathname: `/chatroom`,
           username: this.state.username,
-          socketCli: this.state.socketCli.client
-        }
+          socketCli: this.socketCli
       }} />;
     }
 
@@ -69,7 +67,7 @@ class Login extends React.Component {
       }
     }
 
-    this.state.socketCli.registerName(this.state.username, getRegisterState.bind(this));
+    this.socketCli.registerName(this.state.username, getRegisterState.bind(this));
 
   }
 }
