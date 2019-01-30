@@ -40,7 +40,7 @@ app.get(`*`, (req, res) => {
 const clientManager = new ClientManager;
 
 io.of(`/debugger`).on('connection', (client) => {
-  console.log(`debugger connected as ${client.id}`);
+  console.log(`debugger connected as ${client.id}`); // eslint-disable-line
 
   client.on(`debug:getAllClients`, (cb) => {
     cb(clientManager.getAllClients());
@@ -65,6 +65,7 @@ io.of(`/app`).on(`connection`, (client) => {
     try {
       clientManager.register(client.id, name);
       cb(true);
+      console.log(Object.keys(clientManager.allClients.get(client.id).client.rooms)); // eslint-disable-line
     } catch (e) {
       cb(false);
     }

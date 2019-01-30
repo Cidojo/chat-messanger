@@ -1,14 +1,12 @@
-class ClientManager {
+class RoomManager {
   constructor() {
-    this.allClients = new Map();
-    this.registeredClients = new Map();
+    this.allRooms = new Map();
 
-    this.isNameTaken = this.isNameTaken.bind(this);
     this.register = this.register.bind(this);
   }
 
-  add(client) {
-    this.allClients.set(client.id, {client});
+  add(room) {
+    this.allClients.set(room.name, {id: room.id});
   }
 
   delete(id) {
@@ -20,11 +18,8 @@ class ClientManager {
     if (this.isNameTaken(name)) {
       throw new Error(`Name taken`);
     }
-    const client = this.allClients.get(id);
-
-    client.name = name;
-    client.client.join(name);
-    this.registeredClients.set(id, client);
+    this.allClients.get(id).name = name;
+    this.registeredClients.set(id, this.allClients.get(id));
   }
 
   isNameTaken(name) {
@@ -50,4 +45,4 @@ class ClientManager {
   }
 }
 
-module.exports = ClientManager;
+module.exports = RoomManager;
