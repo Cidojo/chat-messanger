@@ -1,47 +1,25 @@
+const Room = require('./room.js');
+
+
 class RoomManager {
   constructor() {
-    this.allRooms = new Map();
+    this.rooms = new Set();
 
-    this.register = this.register.bind(this);
+    this.add = this.add.bind(this);
+    this.delete = this.delete.bind(this);
+    this.getRooms = this.getRooms.bind(this);
   }
 
-  add(room) {
-    this.allClients.set(room.name, {id: room.id});
+  add(name) {
+    this.rooms.set(new Room(name));
   }
 
-  delete(id) {
-    this.allClients.delete(id);
-    this.registeredClients.delete(id);
+  delete(room) {
+    this.rooms.delete(room);
   }
 
-  register(id, name) {
-    if (this.isNameTaken(name)) {
-      throw new Error(`Name taken`);
-    }
-    this.allClients.get(id).name = name;
-    this.registeredClients.set(id, this.allClients.get(id));
-  }
-
-  isNameTaken(name) {
-    return [...this.allClients.values()].some((client) => client.name === name);
-  }
-
-  getAllClients() {
-    return [...this.allClients.values()].map((client) => {
-      return {
-        id: client.client.id,
-        username: client.name || `not registered`
-      }
-    });
-  }
-
-  getRegisteredClients() {
-    return [...this.registeredClients.values()].map((client) => {
-      return {
-        id: client.client.id,
-        username: client.name
-      }
-    });
+  getRooms() {
+    return [...this.rooms.values()].map((room) => room.name);
   }
 }
 

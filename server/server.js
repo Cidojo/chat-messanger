@@ -1,8 +1,9 @@
 const path = require('path'),
       http = require('http'),
       express = require('express'),
+      socketIO = require('socket.io'),
       ClientManager = require('./client-manager'),
-      socketIO = require('socket.io');
+      RoomManager = require('./room-manager');
 
 const webpack = require('webpack'),
       config = require('./../webpack.config.js'),
@@ -38,6 +39,7 @@ app.get(`*`, (req, res) => {
 });
 
 const clientManager = new ClientManager;
+const roomManager = new RoomManager;
 
 io.of(`/debugger`).on('connection', (client) => {
   console.log(`debugger connected as ${client.id}`); // eslint-disable-line
