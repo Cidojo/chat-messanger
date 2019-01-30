@@ -25,16 +25,7 @@ class ClientManager {
   }
 
   isNameTaken(name) {
-    const clients = this.allClients.values();
-
-// using for loop to quit func in proper time ( no need to iterate throught all map if found match )
-    for (let i = 0; i < this.allClients.size; i++) {
-      if (clients.next().value.name === name && name !== `Debugger`) {
-        return true;
-      }
-    }
-
-    return false;
+    return [...this.allClients.values()].some((client) => client.name === name);
   }
 
   getAllClients() {
