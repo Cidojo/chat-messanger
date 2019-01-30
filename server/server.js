@@ -39,11 +39,23 @@ app.get(`*`, (req, res) => {
 
 const clientManager = new ClientManager;
 
-io.on(`connection`, (client) => {
+io.of(`/debugger`).on('connection', (client) => {
+  console.log(`debugger connected as ${client.id}`);
+
+  client.on(`debug:getAllClients`, (cb) => {
+    cb(clientManager.getAllClients());
+  });
+
+  client.on(`debug:getRegisteredClients`, (cb) => {
+    cb(clientManager.getRegisteredClients());
+  });
+});
+
+io.of(`/app`).on(`connection`, (client) => {
   console.log(`${client.id} connected...`); // eslint-disable-line
 
   const updateListsEvent = () => {
-    io.emit(`debug:update`, clientManager.getAllClients(), clientManager.getRegisteredClients());
+    io.of(`/debugger`).emit(`debug:update`, clientManager.getAllClients(), clientManager.getRegisteredClients());
   }
 
   clientManager.add(client);
@@ -58,15 +70,6 @@ io.on(`connection`, (client) => {
     }
     updateListsEvent();
   })
-
-  client.on(`debug:getAllClients`, (cb) => {
-    cb(clientManager.getAllClients());
-  });
-
-  client.on(`debug:getRegisteredClients`, (cb) => {
-    cb(clientManager.getRegisteredClients());
-  });
-
 
   client.on(`disconnect`, () => {
     clientManager.delete(client.id);

@@ -1,10 +1,18 @@
 const socketClient = require('socket.io-client');
 
-const initSocketCli = () => {
-  const client = socketClient();
+const initSocketCli = (nsp) => {
+  const client = socketClient(nsp || null);
 
   const registerName = (name, cb) => {
     client.emit(`register`, name, cb);
+  }
+
+  const createMessageHandler = () => {
+    console.log(`createMessageHandler`);
+  }
+
+  const onMessageReceived = () => {
+    console.log(`onMessageReceived`);
   }
 
   const debugGetAllClients = (cb) => {
@@ -20,7 +28,10 @@ const initSocketCli = () => {
   }
 
   return {
+    client,
     registerName,
+    createMessageHandler,
+    onMessageReceived,
     debugGetAllClients,
     debugGetRegisteredClients,
     debugOnUpdate

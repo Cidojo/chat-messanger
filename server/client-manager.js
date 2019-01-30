@@ -8,11 +8,6 @@ class ClientManager {
   }
 
   add(client) {
-    try {
-      this.isNameTaken
-    } catch (e) {
-      return e;
-    }
     this.allClients.set(client.id, {client});
   }
 
@@ -34,7 +29,7 @@ class ClientManager {
 
 // using for loop to quit func in proper time ( no need to iterate throught all map if found match )
     for (let i = 0; i < this.allClients.size; i++) {
-      if (clients.next().value.name === name) {
+      if (clients.next().value.name === name && name !== `Debugger`) {
         return true;
       }
     }
