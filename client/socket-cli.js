@@ -7,12 +7,12 @@ const initSocketCli = (nsp) => {
     client.emit(`register`, name, cb);
   }
 
-  const createMessageHandler = () => {
-    console.log(`createMessageHandler`);
+  const createMessageHandler = (roomName, message) => {
+    client.emit(`createMessageHandler`, roomName, message);
   }
 
-  const onMessageReceived = () => {
-    console.log(`onMessageReceived`);
+  const onMessageReceived = (cb) => {
+    client.on(`onMessageReceived`, (message) => cb(message));
   }
 
   const debugGetAllUsers = (cb) => {

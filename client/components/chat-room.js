@@ -36,22 +36,22 @@ class ChatRoom extends React.Component {
  }
 
  render() {
-  return (
-    <div className="chat-room">
-      <h3 className="chat-room__title">Chat Room: {this.state.username}</h3>
-      <div className="chat-room__container">
-        <Messages messages={this.state.messages} />
-        <ChatInput onSend={this.sendHandler} />
+    return (
+      <div className="chat-room">
+        <h3 className="chat-room__title">Chat Room: {this.state.username}</h3>
+        <div className="chat-room__container">
+          <Messages messages={this.state.messages} />
+          <ChatInput onSend={this.sendHandler} />
+        </div>
+        <RoomUsersList ref={this.roomUserList} members={this.state.members} />
+        <GlobalUsersList ref={this.globalUserList} users={this.state.globalUsers} onInvite={this.invite} />
       </div>
-      <RoomUsersList ref={this.roomUserList} members={this.state.members} />
-      <GlobalUsersList ref={this.globalUserList} users={this.state.globalUsers} onInvite={this.invite} />
-    </div>
-  );
+    );
   }
 
   sendHandler(message) {
     // Emit the message to the server
-    this.socketCli.createMessageHandler(this.state.username, message);
+    this.socketCli.createMessageHandler(this.state.room, message);
     this.socketCli.onMessageReceived(this.addMessage);
   }
 

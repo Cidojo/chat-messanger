@@ -2,6 +2,7 @@ const path = require('path'),
       http = require('http'),
       express = require('express'),
       socketIO = require('socket.io'),
+      moment = require('moment'),
       ClientManager = require('./client-manager'),
       RoomManager = require('./room-manager');
 
@@ -110,10 +111,24 @@ io.of(`/app`).on(`connection`, (client) => {
     });
   });
 
+  client.on(`createMessageHandler`, (room, message) => {
+    io.of(`/app`).to(room).emit(`onMessageReceived`, {
+      from: clientManager.getUserById(client.id).name,
+      text: message,
+      createdAt: moment().format(`hh mm ss a`)
+    });
+    console.log(`Message from: ${roomManager.getRoomByName(room).name}: `, message)
+  });
+
   client.on(`disconnect`, () => {
     clientManager.delete(client.id);
     updateListsEvent();
 
     console.log(`${client.id} has disconnected...`); // eslint-disable-line
   });
+
+  client.on('error', function (err) {
+    console.log('received error from client:', client.id);
+    console.log(err);
+  })
 });

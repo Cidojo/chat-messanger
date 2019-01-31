@@ -12,6 +12,7 @@ class RoomManager {
     this.getRooms = this.getRooms.bind(this);
     this.addMemberToRoom = this.addMemberToRoom.bind(this);
     this.getRoomMembersByRoomID = this.getRoomMembersByRoomID.bind(this);
+    this.getRoomByName = this.getRoomByName.bind(this);
   }
 
   addRoom(id, name) {
@@ -30,17 +31,21 @@ class RoomManager {
     return this.rooms.get(id);
   }
 
-  getRoomMembersByName(roomName) {
+  getRoomByName(roomName) {
     let roomsIterMap = this.rooms.values();
     for (let i = 0; i < this.rooms.size; i++) {
       let current = roomsIterMap.next().value;
 
       if (current.name === roomName) {
-        return [...current.getMembers().values()];
+        return current;
       }
     }
 
     throw new Error(`No such room`);
+  }
+
+  getRoomMembersByName(roomName) {
+    return [...this.getRoomByName(roomName).getMembers().values()];
   }
 
   getRoomMembersByRoomID(roomID) {

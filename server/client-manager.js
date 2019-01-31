@@ -67,6 +67,10 @@ class ClientManager {
 
     throw new Error(`No such room`);
   }
+
+  getUserById(id) {
+    return this.allUsers.get(id);
+  }
 }
 
 module.exports = ClientManager;
