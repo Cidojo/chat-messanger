@@ -15,8 +15,8 @@ class DebugState extends React.Component {
     this.socketCli = initSocketCli('/debugger');
 
     // this.socketCli.registerName(this.state.username, (flag) => this.setState({registered: flag}));
-    this.socketCli.debugGetAllClients(this.onGetAllClients.bind(this));
-    this.socketCli.debugGetRegisteredClients(this.onGetRegisteredClients.bind(this));
+    this.socketCli.debugGetAllUsers(this.onGetAllUsers.bind(this));
+    this.socketCli.debugGetRegisteredUsers(this.onGetRegisteredUsers.bind(this));
     this.socketCli.debugOnUpdate(this.onUpdateUsers.bind(this));
  }
 
@@ -28,7 +28,7 @@ render() {
         {this.state.clientsAll ? this.state.clientsAll.map((client, k) => {
           return (
             <li key={k} className="debug__item">
-              ID: {client.id} , NAME: {client.username}
+              ID: {client.id} , NAME: {client.name}
             </li>
           );
         }) :
@@ -38,7 +38,7 @@ render() {
         {this.state.clientsRegistered ? this.state.clientsRegistered.map((client, k) => {
           return (
             <li key={k} className="debug__item">
-              ID: {client.id} , NAME: {client.username}
+              ID: {client.id} , NAME: {client.name}
             </li>
           );
         }) :
@@ -55,13 +55,13 @@ render() {
     });
   }
 
-  onGetAllClients(all) {
+  onGetAllUsers(all) {
     this.setState({
       clientsAll: all
     });
   }
 
-  onGetRegisteredClients(registered) {
+  onGetRegisteredUsers(registered) {
     this.setState({
       clientsRegistered: registered
     });

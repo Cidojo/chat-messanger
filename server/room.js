@@ -1,26 +1,23 @@
-const makeHandlers = () => {
-  const createMessageHandler = () => {
-  }
-}
-
 class Room {
   constructor(name) {
-    this.room = {
-      name,
-      members: new Set()
-    }
+    this.name = name;
+    this.members = new Map();
+
+    this.addMember = this.addMember.bind(this);
+    this.deleteMember = this.deleteMember.bind(this);
+    this.getMembers = this.getMembers.bind(this);
   }
 
-  addMember(name) {
-    this.members.set(name);
+  addMember(member) {
+    this.members.set(member.id, member);
   }
 
-  deleteMember(name) {
-    this.members.delete(name);
+  deleteMember(id) {
+    this.members.delete(id);
   }
 
   getMembers() {
-    return [...this.members];
+    return [...this.members.values()].map((member) => member.name);
   }
 }
 

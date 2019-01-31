@@ -34,30 +34,34 @@ app.use(webpackDevMiddleware(compiler, {
 // routing
 app.use(express.static(publicPath));
 
+
 app.get(`*`, (req, res) => {
   res.sendFile(path.join(publicPath, `index.html`));
 });
 
+
 const clientManager = new ClientManager;
 const roomManager = new RoomManager;
+
 
 io.of(`/debugger`).on('connection', (client) => {
   console.log(`debugger connected as ${client.id}`); // eslint-disable-line
 
-  client.on(`debug:getAllClients`, (cb) => {
-    cb(clientManager.getAllClients());
+  client.on(`debug:getAllUsers`, (cb) => {
+    cb(clientManager.getAllUsers());
   });
 
-  client.on(`debug:getRegisteredClients`, (cb) => {
-    cb(clientManager.getRegisteredClients());
+  client.on(`debug:getRegisteredUsers`, (cb) => {
+    cb(clientManager.getRegisteredUsers());
   });
 });
+
 
 io.of(`/app`).on(`connection`, (client) => {
   console.log(`${client.id} connected...`); // eslint-disable-line
 
   const updateListsEvent = () => {
-    io.of(`/debugger`).emit(`debug:update`, clientManager.getAllClients(), clientManager.getRegisteredClients());
+    io.of(`/debugger`).emit(`debug:update`, clientManager.getAllUsers(), clientManager.getRegisteredUsers());
   }
 
   clientManager.add(client);
@@ -65,14 +69,40 @@ io.of(`/app`).on(`connection`, (client) => {
 
   client.on(`register`, (name, cb) => {
     try {
+      // register user when user gets name
       clientManager.register(client.id, name);
-      cb(true);
-      console.log(Object.keys(clientManager.allClients.get(client.id).client.rooms)); // eslint-disable-line
+
+      // callback on client side which flags if register succeed
     } catch (e) {
+      // callback on client side which flags if register reject (reject only if name is already registered with another user)
       cb(false);
     }
+
+    client.join(name);
+
+    // create new room with room.name = username (user default room)
+    roomManager.addRoom(client.id, name);
+
+    // add current user to it's default room
+    roomManager.addMemberToRoom(clientManager.allUsers.get(client.id), client.id);
+
+    cb(true);
+
     updateListsEvent();
   })
+
+  client.on(`getRoomMembersList`, (room, cb) => {
+    cb(roomManager.getRoomMembersByName(room));
+  });
+
+  // client.on(`newMessage`, (cb) => {
+  //   cb()
+  // });
+  //
+  // client.on(`sendLink`, (room) => {
+  //   clientManager.get(client.id).client.join(room);
+  //   cb()
+  // });
 
   client.on(`disconnect`, () => {
     clientManager.delete(client.id);

@@ -3,19 +3,48 @@ const Room = require('./room.js');
 
 class RoomManager {
   constructor() {
-    this.rooms = new Set();
+    this.rooms = new Map();
 
-    this.add = this.add.bind(this);
-    this.delete = this.delete.bind(this);
+    this.addRoom = this.addRoom.bind(this);
+    this.deleteRoom = this.deleteRoom.bind(this);
+    this.getRoomByID = this.getRoomByID.bind(this);
+    this.getRoomMembersByName = this.getRoomMembersByName.bind(this);
     this.getRooms = this.getRooms.bind(this);
+    this.addMemberToRoom = this.addMemberToRoom.bind(this);
+    this.getRoomMembersByRoomID = this.getRoomMembersByRoomID.bind(this);
   }
 
-  add(name) {
-    this.rooms.set(new Room(name));
+  addRoom(id, name) {
+    this.rooms.set(id, new Room(name));
   }
 
-  delete(room) {
-    this.rooms.delete(room);
+  deleteRoom(id) {
+    this.rooms.delete(id);
+  }
+
+  addMemberToRoom(member, roomID) {
+    this.getRoomByID(roomID).addMember(member);
+  }
+
+  getRoomByID(id) {
+    return this.rooms.get(id);
+  }
+
+  getRoomMembersByName(roomName) {
+    let roomsIterMap = this.rooms.values();
+    for (let i = 0; i < this.rooms.size; i++) {
+      let current = roomsIterMap.next().value;
+
+      if (current.name === roomName) {
+        return [...current.getMembers().values()];
+      }
+    }
+
+    throw new Error(`No such room`);
+  }
+
+  getRoomMembersByRoomID(roomID) {
+    return [...this.getRoomByID(roomID).getMembers().values()].map((member) => member.name);
   }
 
   getRooms() {

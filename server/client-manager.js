@@ -1,50 +1,51 @@
 class ClientManager {
   constructor() {
-    this.allClients = new Map();
-    this.registeredClients = new Map();
+    this.allUsers = new Map();
+    this.registeredUsers = new Map();
 
     this.isNameTaken = this.isNameTaken.bind(this);
     this.register = this.register.bind(this);
   }
 
   add(client) {
-    this.allClients.set(client.id, {client});
+    this.allUsers.set(client.id, {client, id: client.id});
   }
 
   delete(id) {
-    this.allClients.delete(id);
-    this.registeredClients.delete(id);
+    this.allUsers.delete(id);
+    this.registeredUsers.delete(id);
   }
 
   register(id, name) {
     if (this.isNameTaken(name)) {
       throw new Error(`Name taken`);
     }
-    const client = this.allClients.get(id);
 
-    client.name = name;
-    client.client.join(name);
-    this.registeredClients.set(id, client);
+    const user = this.allUsers.get(id);
+
+    user.name = name;
+
+    this.registeredUsers.set(id, user);
   }
 
   isNameTaken(name) {
-    return [...this.allClients.values()].some((client) => client.name === name);
+    return [...this.allUsers.values()].some((user) => user.name === name);
   }
 
-  getAllClients() {
-    return [...this.allClients.values()].map((client) => {
+  getAllUsers() {
+    return [...this.allUsers.values()].map((user) => {
       return {
-        id: client.client.id,
-        username: client.name || `not registered`
+        id: user.id,
+        name: user.name || `not registered`
       }
     });
   }
 
-  getRegisteredClients() {
-    return [...this.registeredClients.values()].map((client) => {
+  getRegisteredUsers() {
+    return [...this.registeredUsers.values()].map((user) => {
       return {
-        id: client.client.id,
-        username: client.name
+        id: user.id,
+        name: user.name
       }
     });
   }

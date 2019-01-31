@@ -15,12 +15,23 @@ const initSocketCli = (nsp) => {
     console.log(`onMessageReceived`);
   }
 
-  const debugGetAllClients = (cb) => {
-    client.emit(`debug:getAllClients`, cb);
+  const debugGetAllUsers = (cb) => {
+    client.emit(`debug:getAllUsers`, cb);
   }
 
-  const debugGetRegisteredClients = (cb) => {
-    client.emit(`debug:getRegisteredClients`, cb);
+  const debugGetRegisteredUsers = (cb) => {
+    client.emit(`debug:getRegisteredUsers`, cb);
+  }
+
+  const getRoomMembersList = (room, cb) => {
+    client.emit(`getRoomMembersList`, room, cb);
+  }
+
+  const newMessageHandler = (message) => {
+    client.broadcast.emit(`newMessage`, message);
+  }
+  const sendLinkHandler = (to, room) => {
+    client.to(to).emit(`sendLink`, room);
   }
 
   const debugOnUpdate = (cb) => {
@@ -29,11 +40,14 @@ const initSocketCli = (nsp) => {
 
   return {
     client,
+    getRoomMembersList,
+    newMessageHandler,
+    sendLinkHandler,
     registerName,
     createMessageHandler,
     onMessageReceived,
-    debugGetAllClients,
-    debugGetRegisteredClients,
+    debugGetAllUsers,
+    debugGetRegisteredUsers,
     debugOnUpdate
   }
 }

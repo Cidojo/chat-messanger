@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Messages from './messages';
 import ChatInput from './chat-input';
-import UsersList from './users-list';
+import RoomUsersList from './room-users-list';
 import './chat-room.css';
 
 
@@ -11,15 +11,22 @@ class ChatRoom extends React.Component {
     super(props);
 
     this.state = {
+      room: this.props.location.defaultRoom,
       username: this.props.location.username,
       messages: [],
-      members: [],
+      members: []
     };
+
+    this.userList = React.createRef();
 
     this.socketCli = this.props.location.socketCli;
 
+    this.updateMembersList = this.updateMembersList.bind(this);
     this.sendHandler = this.sendHandler.bind(this);
     this.addMessage = this.addMessage.bind(this);
+
+
+    this.socketCli.getRoomMembersList(this.state.room, this.updateMembersList);
  }
 
  render() {
@@ -30,7 +37,7 @@ class ChatRoom extends React.Component {
         <Messages messages={this.state.messages} />
         <ChatInput onSend={this.sendHandler} />
       </div>
-      <UsersList />
+      <RoomUsersList ref={this.userList} members={this.state.members} />
     </div>
   );
   }
@@ -47,11 +54,19 @@ class ChatRoom extends React.Component {
     messages.push(message);
     this.setState({messages});
   }
+
+  updateMembersList(list) {
+    this.setState({members: list});
+    this.userList.current.updateList(list);
+    console.log(list);
+    console.log(this.state.members);
+  }
 }
 
 ChatRoom.propTypes = {
   state: PropTypes.any,
-  location: PropTypes.any
+  location: PropTypes.any,
+  room: PropTypes.string
 }
 
 export default ChatRoom;
