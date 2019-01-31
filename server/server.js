@@ -95,14 +95,20 @@ io.of(`/app`).on(`connection`, (client) => {
     cb(roomManager.getRoomMembersByName(room));
   });
 
+  client.on(`getGlobalUsersList`, (cb) => {
+    cb(clientManager.getGlobalUsersList());
+  });
+
   // client.on(`newMessage`, (cb) => {
   //   cb()
   // });
-  //
-  // client.on(`sendLink`, (room) => {
-  //   clientManager.get(client.id).client.join(room);
-  //   cb()
-  // });
+
+  client.on(`invite`, (to, room) => {
+    clientManager.getUserByName(to).client.join(room, () => {
+      let rooms = Object.keys(clientManager.getUserByName(to).client.rooms);
+      console.log(rooms);
+    });
+  });
 
   client.on(`disconnect`, () => {
     clientManager.delete(client.id);

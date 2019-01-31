@@ -11,18 +11,26 @@ class RoomUsersList extends React.Component {
       members: this.props.members
     }
 
-    this.state.members;
+    this.onInvite = this.props.onInvite;
+
     this.updateList = this.updateList.bind(this);
   }
 
   render() {
     const members = this.state.members.map((member, i) => {
       return (
-        <li key={i}>{member}</li>
+        <li
+        key={i}
+        onDoubleClick={((e) => {
+          this.onInvite(e.target.innerText)
+        }).bind(this)}
+        >
+          {member}
+        </li>
       )})
 
     return (
-      <ul className="users-list">Online users:
+      <ul className="users-list">Room users:
         {members}
       </ul>
     );
@@ -34,7 +42,8 @@ class RoomUsersList extends React.Component {
 }
 
 RoomUsersList.propTypes = {
-  members: PropTypes.array
+  members: PropTypes.array,
+  onInvite: PropTypes.func
 }
 
 export default RoomUsersList;

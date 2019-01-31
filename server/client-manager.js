@@ -49,6 +49,24 @@ class ClientManager {
       }
     });
   }
+
+  getGlobalUsersList() {
+    return [...this.registeredUsers.values()].map((user) => user.name);
+  }
+
+  getUserByName(name) {
+    let userIterMap = this.registeredUsers.values();
+
+    for (let i = 0; i < this.registeredUsers.size; i++) {
+      let current = userIterMap.next().value;
+
+      if (current.name === name) {
+        return current;
+      }
+    }
+
+    throw new Error(`No such room`);
+  }
 }
 
 module.exports = ClientManager;

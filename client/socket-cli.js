@@ -27,11 +27,16 @@ const initSocketCli = (nsp) => {
     client.emit(`getRoomMembersList`, room, cb);
   }
 
+  const getGlobalUsersList = (cb) => {
+    client.emit(`getGlobalUsersList`, cb);
+  }
+
   const newMessageHandler = (message) => {
     client.broadcast.emit(`newMessage`, message);
   }
-  const sendLinkHandler = (to, room) => {
-    client.to(to).emit(`sendLink`, room);
+
+  const inviteHandler = (to, room) => {
+    client.emit(`invite`, to, room);
   }
 
   const debugOnUpdate = (cb) => {
@@ -40,9 +45,10 @@ const initSocketCli = (nsp) => {
 
   return {
     client,
+    getGlobalUsersList,
     getRoomMembersList,
     newMessageHandler,
-    sendLinkHandler,
+    inviteHandler,
     registerName,
     createMessageHandler,
     onMessageReceived,

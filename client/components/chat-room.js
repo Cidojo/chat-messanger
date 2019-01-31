@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Messages from './messages';
 import ChatInput from './chat-input';
 import RoomUsersList from './room-users-list';
+import GlobalUsersList from './global-users-list';
 import './chat-room.css';
 
 
@@ -14,19 +15,24 @@ class ChatRoom extends React.Component {
       room: this.props.location.defaultRoom,
       username: this.props.location.username,
       messages: [],
-      members: []
+      members: [],
+      globalUsers: []
     };
 
-    this.userList = React.createRef();
+    this.roomUserList = React.createRef();
+    this.globalUserList = React.createRef();
 
     this.socketCli = this.props.location.socketCli;
 
     this.updateMembersList = this.updateMembersList.bind(this);
+    this.updateGlobalUsersList = this.updateGlobalUsersList.bind(this);
     this.sendHandler = this.sendHandler.bind(this);
     this.addMessage = this.addMessage.bind(this);
+    this.invite = this.invite.bind(this);
 
 
     this.socketCli.getRoomMembersList(this.state.room, this.updateMembersList);
+    this.socketCli.getGlobalUsersList(this.updateGlobalUsersList);
  }
 
  render() {
@@ -37,7 +43,8 @@ class ChatRoom extends React.Component {
         <Messages messages={this.state.messages} />
         <ChatInput onSend={this.sendHandler} />
       </div>
-      <RoomUsersList ref={this.userList} members={this.state.members} />
+      <RoomUsersList ref={this.roomUserList} members={this.state.members} />
+      <GlobalUsersList ref={this.globalUserList} users={this.state.globalUsers} onInvite={this.invite} />
     </div>
   );
   }
@@ -57,9 +64,16 @@ class ChatRoom extends React.Component {
 
   updateMembersList(list) {
     this.setState({members: list});
-    this.userList.current.updateList(list);
-    console.log(list);
-    console.log(this.state.members);
+    this.roomUserList.current.updateList(list);
+  }
+
+  updateGlobalUsersList(list) {
+    this.setState({users: list});
+    this.globalUserList.current.updateList(list);
+  }
+
+  invite(to) {
+    this.socketCli.inviteHandler(to, this.state.room);
   }
 }
 
