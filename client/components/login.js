@@ -14,7 +14,7 @@ class Login extends React.Component {
       nameAvailiable: true,
     }
 
-    this.socketCli = initSocketCli(`/app`);
+    this.socketCli = initSocketCli();
     window.socket = this.socketCli;
 
     this.usernameChangeHandler = this.usernameChangeHandler.bind(this);

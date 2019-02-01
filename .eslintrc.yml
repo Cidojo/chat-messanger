@@ -15,5 +15,9 @@ extends:
   - eslint:recommended
   - plugin:react/recommended
 
+rules:
+  no-trailing-spaces:
+    - error
+
 plugins:
   - react

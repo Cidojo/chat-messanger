@@ -11,13 +11,11 @@ class RoomUsersList extends React.Component {
       members: this.props.members
     }
 
-    this.onInvite = this.props.onInvite;
-
     this.updateList = this.updateList.bind(this);
   }
 
   render() {
-    const members = this.state.members.map((member, i) => {
+    const members = this.props.members.map((member, i) => {
       return (
         <li
         key={i}
@@ -36,6 +34,7 @@ class RoomUsersList extends React.Component {
     );
   }
 
+
   updateList(list) {
     this.setState({members: list});
   }
@@ -43,7 +42,6 @@ class RoomUsersList extends React.Component {
 
 RoomUsersList.propTypes = {
   members: PropTypes.array,
-  onInvite: PropTypes.func
 }
 
 export default RoomUsersList;

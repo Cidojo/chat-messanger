@@ -22,7 +22,6 @@ class ChatRoom extends React.Component {
     this.roomUserList = React.createRef();
     this.globalUserList = React.createRef();
 
-    this.socketCli = this.props.location.socketCli;
 
     this.updateMembersList = this.updateMembersList.bind(this);
     this.updateGlobalUsersList = this.updateGlobalUsersList.bind(this);
@@ -31,8 +30,10 @@ class ChatRoom extends React.Component {
     this.invite = this.invite.bind(this);
 
 
+    this.socketCli = this.props.location.socketCli;
     this.socketCli.getRoomMembersList(this.state.room, this.updateMembersList);
     this.socketCli.getGlobalUsersList(this.updateGlobalUsersList);
+    this.socketCli.onMessageReceived(this.addMessage);
  }
 
  render() {
@@ -52,14 +53,10 @@ class ChatRoom extends React.Component {
   sendHandler(message) {
     // Emit the message to the server
     this.socketCli.createMessageHandler(this.state.room, message);
-    this.socketCli.onMessageReceived(this.addMessage);
   }
 
   addMessage(message) {
-    // Append the message to the component state
-    const messages = this.state.messages;
-    messages.push(message);
-    this.setState({messages});
+    this.setState({messages: [...this.state.messages, message]});
   }
 
   updateMembersList(list) {

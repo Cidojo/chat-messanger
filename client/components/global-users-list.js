@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './room-users-list.css';
+import './global-users-list.css';
 
 
 

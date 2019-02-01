@@ -45,11 +45,11 @@ class RoomManager {
   }
 
   getRoomMembersByName(roomName) {
-    return [...this.getRoomByName(roomName).getMembers().values()];
+    return [...this.getRoomByName(roomName).getMemberList().values()];
   }
 
   getRoomMembersByRoomID(roomID) {
-    return [...this.getRoomByID(roomID).getMembers().values()].map((member) => member.name);
+    return [...this.getRoomByID(roomID).getMemberList().values()].map((member) => member.name);
   }
 
   getRooms() {
