@@ -4,15 +4,6 @@ const Room = require('./room.js');
 class RoomManager {
   constructor() {
     this.rooms = new Map();
-
-    this.addRoom = this.addRoom.bind(this);
-    this.deleteRoom = this.deleteRoom.bind(this);
-    this.getRoomByID = this.getRoomByID.bind(this);
-    this.getRoomMembersByName = this.getRoomMembersByName.bind(this);
-    this.getRooms = this.getRooms.bind(this);
-    this.addMemberToRoom = this.addMemberToRoom.bind(this);
-    this.getRoomMembersByRoomID = this.getRoomMembersByRoomID.bind(this);
-    this.getRoomByName = this.getRoomByName.bind(this);
   }
 
   addRoom(id, name) {
@@ -24,13 +15,12 @@ class RoomManager {
   }
 
   addMemberToRoom(member, roomName) {
+    member.client.join(roomName);
     this.getRoomByName(roomName).addMember(member);
   }
 
   deleteMemberFromRooms(user) {
-    console.log(Object.keys(user.client.rooms));
     Object.keys(user.client.rooms).forEach((room, i) => {
-      console.log(room);
       const chat = this.getRoomByName(room);
       if (i > 0) {
         chat.deleteMember(chat.members.get(user.client.id));
@@ -43,7 +33,6 @@ class RoomManager {
   }
 
   getRoomByName(roomName) {
-    console.log(roomName);
     let roomsIterMap = this.rooms.values();
     for (let i = 0; i < this.rooms.size; i++) {
       let current = roomsIterMap.next().value;
@@ -54,7 +43,7 @@ class RoomManager {
     }
   }
 
-  getRoomMembersByName(roomName) {
+  getRoomMembersByRoomName(roomName) {
     return [...this.getRoomByName(roomName).getMemberList().values()];
   }
 

@@ -11,14 +11,13 @@ class Login extends React.Component {
     this.state = {
       username: null,
       registered: false,
-      nameAvailiable: true,
+      nameAvailiability: true
     }
-
-    this.socketCli = initSocketCli();
-    window.socket = this.socketCli;
 
     this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
     this.usernameSubmitHandler = this.usernameSubmitHandler.bind(this);
+
+    this.socketCli = initSocketCli();
   }
 
   render() {
@@ -26,7 +25,7 @@ class Login extends React.Component {
       return <Redirect to={{
           pathname: `/chatroom`,
           username: this.state.username,
-          defaultRoom: [this.state.username, `Bob`],
+          initialRoom: this.state.initialRoom,
           socketCli: this.socketCli
       }} />;
     }
@@ -41,7 +40,7 @@ class Login extends React.Component {
           placeholder="Enter your nickname..."
           onChange={this.usernameChangeHandler}
           required />
-        {this.state.nameAvailiable ? null : <label htmlFor="username-form__input" className="username-form__label">name is taken, enter another one</label>}
+        {this.state.nameAvailiability ? null : <label htmlFor="username-form__input" className="username-form__label">name is taken, enter another one</label>}
         <button className="btn username-form__submit" type="submit">Join</button>
       </form>
     );
@@ -50,21 +49,22 @@ class Login extends React.Component {
   usernameChangeHandler(event) {
     this.setState({
       username: event.target.value,
-      nameAvailiable: true
+      nameAvailiability: true
     });
   }
 
   usernameSubmitHandler(evt) {
     evt.preventDefault();
 
-    const getRegisterState = (flag) => {
-      if (flag) {
+    const getRegisterState = (nameAvailiabilityState, room) => {
+      if (nameAvailiabilityState) {
         this.setState({
-          registered: true
+          registered: true,
+          initialRoom: room
         });
       } else {
         this.setState({
-          nameAvailiable: false
+          nameAvailiability: nameAvailiabilityState
         });
       }
     }

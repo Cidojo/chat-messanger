@@ -15,7 +15,7 @@ const initSocketCli = (nsp) => {
     client.on(`refresh:room`, cb);
   }
 
-  const createMessageHandler = (roomName, text) => {
+  const handlePostMessage = (roomName, text) => {
     client.emit(`message:post`, roomName, text);
   }
 
@@ -25,22 +25,24 @@ const initSocketCli = (nsp) => {
     });
   }
 
-  const onMessageReceived = (cb) => {
+  const onGetMessage = (cb) => {
     client.on(`message:get`, (message) => {
       cb(message);
     });
   }
 
-  const getRoomMembersList = (room, cb) => {
-    client.emit(`members:get`, room, cb);
-  }
-
-  const getGlobalUsersList = (cb) => {
+  const getGlobalUserList = (cb) => {
     client.emit(`users:get`, cb);
   }
 
-  const inviteHandler = (to, room) => {
-    client.emit(`invite`, to, room);
+  const handleInvite = (to, room) => {
+    client.emit(`invite:emit`, to, room);
+  }
+
+  const onInvitation = (cb) => {
+    client.on(`invite:query`, (message) => {
+      cb(message);
+    });
   }
 
   const enterRoomHandler = (cb) => {
@@ -49,16 +51,16 @@ const initSocketCli = (nsp) => {
 
   return {
     client,
-    getGlobalUsersList,
-    getRoomMembersList,
-    inviteHandler,
+    getGlobalUserList,
+    handleInvite,
     registerName,
-    createMessageHandler,
-    onMessageReceived,
+    handlePostMessage,
+    onGetMessage,
     refreshGlobal,
     refreshRoom,
     enterRoomHandler,
-    onNewUser
+    onNewUser,
+    onInvitation
   }
 }
 

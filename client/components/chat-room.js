@@ -6,52 +6,41 @@ import RoomUsersList from './room-users-list';
 import GlobalUsersList from './global-users-list';
 import './chat-room.css';
 
-const chatRoomScript = (e) => {
-  const chatTogglers = document.querySelectorAll(`.chat-room__toggle input`);
-  const chatRooms = document.querySelectorAll(`.chat-room__item`);
-
-  chatTogglers.forEach((toggle, i) => {
-    toggle.addEventListener(`checked`, () => {
-      chatRooms[i].classList.remove(`chat-room__item--hidden`);
-      e.currentTarget.classList.add(`chat-room__item--hidden`);
-    });
-  });
-}
 
 class ChatRoom extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      rooms: this.props.location.defaultRoom,
       username: this.props.location.username,
-      messages: [],
-      members: [],
-      globalUsers: [],
-      currentChat: this.props.location.defaultRoom[0]
+      rooms: [this.props.location.initialRoom],
+      globalUserList: [],
+      messages: this.props.location.initialRoom.chatHistory,
+      currentRoomIndex: 0
     };
 
     this.roomUserList = React.createRef();
     this.globalUserList = React.createRef();
 
 
-    this.updateMembersList = this.updateMembersList.bind(this);
-    this.updateGlobalUsersList = this.updateGlobalUsersList.bind(this);
-    this.sendHandler = this.sendHandler.bind(this);
-    this.addMessage = this.addMessage.bind(this);
+    this.updateMemberList = this.updateMemberList.bind(this);
+    this.updateGlobalUserList = this.updateGlobalUserList.bind(this);
+    this.postMessage = this.postMessage.bind(this);
+    this.getMessage = this.getMessage.bind(this);
     this.invite = this.invite.bind(this);
     this.onChangeRoom = this.onChangeRoom.bind(this);
     this.handleChatScreenToggle = this.handleChatScreenToggle.bind(this);
+    this.getCurrentRoom = this.getCurrentRoom.bind(this);
 
 
     this.socketCli = this.props.location.socketCli;
-    this.socketCli.getRoomMembersList(this.state.currentChat, this.updateMembersList);
-    this.socketCli.getGlobalUsersList(this.updateGlobalUsersList);
-    this.socketCli.onMessageReceived(this.addMessage);
-    this.socketCli.refreshGlobal(this.updateGlobalUsersList);
-    this.socketCli.refreshRoom(this.updateMembersList);
+    this.socketCli.getGlobalUserList(this.updateGlobalUserList);
+    this.socketCli.onGetMessage(this.getMessage);
+    this.socketCli.refreshGlobal(this.updateGlobalUserList);
+    this.socketCli.refreshRoom(this.updateMemberList);
     this.socketCli.enterRoomHandler(this.onChangeRoom);
-    this.socketCli.onNewUser(this.addMessage);
+    this.socketCli.onNewUser(this.getMessage);
+    this.socketCli.onInvitation(this.getMessage);
   }
 
   render() {
@@ -62,12 +51,13 @@ class ChatRoom extends React.Component {
           return (
             <li key={i} className="chat-room__toggle">
               <label>
-                {room}
+                {room.name}
                 <input
                   type="radio"
                   name="chat-room__toggle"
-                  value={room}
+                  value={room.name}
                   onChange={this.handleChatScreenToggle}
+                  defaultChecked={i === this.state.currentRoomIndex}
                 />
               </label>
             </li>
@@ -75,56 +65,59 @@ class ChatRoom extends React.Component {
         })}
       </ul>
       <ul className="chat-room__list">
-        {this.state.rooms.map((room , i) => {
-          return (
-            <li key={i} className={room === this.state.currentChat ? `chat-room__item` : `chat-room__item--hidden`}>
-              <h3 className="chat-room__title">Chat Room: {room}</h3>
-              <div className="chat-room__container">
-                <Messages messages={this.state.messages} />
-                <ChatInput onSend={this.sendHandler} />
-              </div>
-            </li>
-          )
-        })}
-        <RoomUsersList ref={this.roomUserList} members={this.state.members} />
-        <GlobalUsersList ref={this.globalUserList} users={this.state.globalUsers} onInvite={this.invite} />
+        <li className={`chat-room__item`}>
+          <h3 className="chat-room__title">Chat Room: {this.getCurrentRoom().name}</h3>
+          <div className="chat-room__container">
+            <Messages messages={this.state.messages} />
+            <ChatInput onPostMessage={this.postMessage} />
+          </div>
+        </li>
+        <RoomUsersList ref={this.roomUserList} members={this.getCurrentRoom().members} />
+        <GlobalUsersList ref={this.globalUserList} users={this.state.globalUserList} onInvite={this.invite} />
       </ul>
       </main>
     );
   }
 
+  getCurrentRoom() {
+    return this.state.rooms[this.state.currentRoomIndex];
+  }
+
   handleChatScreenToggle(e) {
-    console.log(e.currentTarget.value);
-    this.setState({currentChat: e.currentTarget.value});
+    const currentRoomIndex = this.state.rooms.findIndex((room) => room.name === e.currentTarget.value);
+    this.setState({currentRoomIndex});
   }
 
-  sendHandler(message) {
-    // Emit the message to the server
-    this.socketCli.createMessageHandler(this.state.currentChat, message);
+  postMessage(message) {
+    this.socketCli.handlePostMessage(this.getCurrentRoom().name, message);
   }
 
-  addMessage(message) {
+  getMessage(message) {
     this.setState({messages: [...this.state.messages, message]});
   }
 
-  updateMembersList(list) {
+  updateMemberList(list) {
     this.setState({members: list});
     this.roomUserList.current.updateList(list);
   }
 
-  updateGlobalUsersList(list) {
-    this.setState({users: list});
+  updateGlobalUserList(list) {
+    this.setState({globalUserList: list});
     this.globalUserList.current.updateList(list);
   }
 
   invite(to) {
-    this.socketCli.inviteHandler(to, this.state.currentChat);
+    this.socketCli.handleInvite(to, this.getCurrentRoom().name);
   }
 
   onChangeRoom(room) {
     const rooms = this.state.rooms;
+
     rooms.push(room);
-    this.setState({rooms});
+    this.setState({
+      rooms,
+      currentRoom: room
+    });
   }
 }
 

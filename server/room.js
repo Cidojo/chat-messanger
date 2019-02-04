@@ -3,13 +3,14 @@ class Room {
     this.name = name;
     this.members = new Map();
     this.chatHistory = [];
+  }
 
-    this.broadcastMessage = this.broadcastMessage.bind(this);
-    this.addEntry = this.addEntry.bind(this);
-    this.getChatHistory = this.getChatHistory.bind(this);
-    this.addMember = this.addMember.bind(this);
-    this.deleteMember = this.deleteMember.bind(this);
-    this.getMemberList = this.getMemberList.bind(this);
+  getProps() {
+    return {
+      name: this.name,
+      members: this.getMemberList(),
+      chatHistory: this.getChatHistory()
+    }
   }
 
   broadcastMessage(message) {

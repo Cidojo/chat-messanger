@@ -11,7 +11,7 @@ const socketHandler = (io) => {
       handleRegister,
       handleGetMembers,
       handleGetUsers,
-      handleInvite,
+      handleInviteEmit,
       handlePostMessage,
       handleDisconnect
     } = makeHandlers(client, clientManager, roomManager);
@@ -26,7 +26,9 @@ const socketHandler = (io) => {
 
     client.on(`users:get`, handleGetUsers);
 
-    client.on(`invite`, handleInvite);
+    client.on(`invite:emit`, handleInviteEmit);
+
+    // client.on(`invite:message`, handleInviteMessage);
 
     client.on(`message:post`, handlePostMessage);
 

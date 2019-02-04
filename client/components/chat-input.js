@@ -31,9 +31,9 @@ class ChatInput extends React.Component {
     // Stop the form from refreshing the page on submit
     evt.preventDefault();
 
-    // Call the onSend callback with the chatInput message
+    // Call the onPostMessage callback with the chatInput message
     if (this.state.chatInput) {
-      this.props.onSend(this.state.chatInput);
+      this.props.onPostMessage(this.state.chatInput);
       // Clear the input box
       this.setState({chatInput: ''});
     }
@@ -41,7 +41,7 @@ class ChatInput extends React.Component {
 }
 
 ChatInput.propTypes = {
-  onSend: PropTypes.func
+  onPostMessage: PropTypes.func
 }
 
 export default ChatInput;
