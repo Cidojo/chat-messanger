@@ -7,8 +7,22 @@ const initSocketCli = (nsp) => {
     client.emit(`register`, name, cb);
   }
 
+  const refreshGlobal = (cb) => {
+    client.on(`refresh:global`, cb);
+  }
+
+  const refreshRoom = (cb) => {
+    client.on(`refresh:room`, cb);
+  }
+
   const createMessageHandler = (roomName, text) => {
     client.emit(`message:post`, roomName, text);
+  }
+
+  const onNewUser = (cb) => {
+    client.on(`message:new-user`, (message) => {
+      cb(message);
+    });
   }
 
   const onMessageReceived = (cb) => {
@@ -29,6 +43,10 @@ const initSocketCli = (nsp) => {
     client.emit(`invite`, to, room);
   }
 
+  const enterRoomHandler = (cb) => {
+    client.on(`enterRoom`, cb);
+  }
+
   return {
     client,
     getGlobalUsersList,
@@ -36,7 +54,11 @@ const initSocketCli = (nsp) => {
     inviteHandler,
     registerName,
     createMessageHandler,
-    onMessageReceived
+    onMessageReceived,
+    refreshGlobal,
+    refreshRoom,
+    enterRoomHandler,
+    onNewUser
   }
 }
 

@@ -11,9 +11,10 @@ class ClientManager {
     this.allUsers.set(client.id, {client, id: client.id});
   }
 
-  delete(id) {
-    this.allUsers.delete(id);
-    this.registeredUsers.delete(id);
+  delete(client) {
+    this.allUsers.delete(client.id);
+    this.registeredUsers.delete(client.id);
+    this.refreshGlobalUserList(client);
   }
 
   register(id, name) {
@@ -26,6 +27,7 @@ class ClientManager {
     user.name = name;
 
     this.registeredUsers.set(id, user);
+    this.refreshGlobalUserList(user.client);
   }
 
   isNameTaken(name) {
@@ -52,6 +54,10 @@ class ClientManager {
 
   getGlobalUsersList() {
     return [...this.registeredUsers.values()].map((user) => user.name);
+  }
+
+  refreshGlobalUserList(client) {
+    client.broadcast.emit(`refresh:global`, this.getGlobalUsersList());
   }
 
   getUserByName(name) {

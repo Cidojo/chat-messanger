@@ -26,7 +26,7 @@ class Login extends React.Component {
       return <Redirect to={{
           pathname: `/chatroom`,
           username: this.state.username,
-          defaultRoom: this.state.username,
+          defaultRoom: [this.state.username, `Bob`],
           socketCli: this.socketCli
       }} />;
     }

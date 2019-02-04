@@ -23,8 +23,19 @@ class RoomManager {
     this.rooms.delete(id);
   }
 
-  addMemberToRoom(member, roomID) {
-    this.getRoomByID(roomID).addMember(member);
+  addMemberToRoom(member, roomName) {
+    this.getRoomByName(roomName).addMember(member);
+  }
+
+  deleteMemberFromRooms(user) {
+    console.log(Object.keys(user.client.rooms));
+    Object.keys(user.client.rooms).forEach((room, i) => {
+      console.log(room);
+      const chat = this.getRoomByName(room);
+      if (i > 0) {
+        chat.deleteMember(chat.members.get(user.client.id));
+      }
+    });
   }
 
   getRoomByID(id) {
@@ -32,6 +43,7 @@ class RoomManager {
   }
 
   getRoomByName(roomName) {
+    console.log(roomName);
     let roomsIterMap = this.rooms.values();
     for (let i = 0; i < this.rooms.size; i++) {
       let current = roomsIterMap.next().value;
@@ -40,8 +52,6 @@ class RoomManager {
         return current;
       }
     }
-
-    throw new Error(`No such room`);
   }
 
   getRoomMembersByName(roomName) {

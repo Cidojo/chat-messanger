@@ -39,4 +39,4 @@ app.get(`*`, (req, res) => {
   res.sendFile(path.join(publicPath, `index.html`));
 });
 
-io.on(`connection`, socketHandler);
+socketHandler(io);

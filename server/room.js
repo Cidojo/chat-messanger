@@ -28,14 +28,20 @@ class Room {
 
   addMember(member) {
     this.members.set(member.id, member);
+    this.refreshMemberList(member.client);
   }
 
-  deleteMember(id) {
-    this.members.delete(id);
+  deleteMember(member) {
+    this.members.delete(member.id);
+    this.refreshMemberList(member.client);
   }
 
   getMemberList() {
     return [...this.members.values()].map((member) => member.name);
+  }
+
+  refreshMemberList(client) {
+    client.to(this.name).emit(`refresh:room`, this.getMemberList());
   }
 }
 

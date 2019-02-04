@@ -14,7 +14,7 @@ class Message extends React.Component {
       return (
         <li className="message">
           <span className={`message__username`}>
-            {[this.state.message.createdAt, this.state.message.from]} :&nbsp;
+            {[this.state.message.createdAt, this.state.message.from || ``]} :&nbsp;
           </span>
 
           <span className="message__body">
