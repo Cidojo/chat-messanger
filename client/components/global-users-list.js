@@ -8,10 +8,9 @@ class GlobalUsersList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      self: this.props.self,
       users: this.props.users
     }
-
-    this.onInvite = this.props.onInvite;
 
     this.updateList = this.updateList.bind(this);
   }
@@ -21,19 +20,22 @@ class GlobalUsersList extends React.Component {
       return (
         <li
         key={i}
-        onDoubleClick={((e) => {
-          this.onInvite(e.target.innerText)
-        }).bind(this)}
+        className="global-users__item"
         >
           {user}
+          {this.state.self === user ? `` : <button onClick={this.onInvite.bind(this, user)}>invite</button>}
         </li>
       )})
 
     return (
-      <ul className="users-list">Online users:
+      <ul className="global-users__list">Online users:
         {users}
       </ul>
     );
+  }
+
+  onInvite(user) {
+    this.props.onInvite(user);
   }
 
   updateList(list) {
@@ -43,7 +45,8 @@ class GlobalUsersList extends React.Component {
 
 GlobalUsersList.propTypes = {
   users: PropTypes.array,
-  onInvite: PropTypes.func
+  onInvite: PropTypes.func,
+  self: PropTypes.string
 }
 
 export default GlobalUsersList;

@@ -47,18 +47,15 @@ const makeHandlers = (client, clientManager, roomManager) => {
     const emitter = clientManager.getUserById(client.id);
     const invitedUser = clientManager.getUserByName(invitedUserName);
     const formattedMessage = getFormattedMessage(`${emitter.name} invites you to join ${roomName} Chat...`, MessageType.INVITATION);
-
-    const serverCb = (acceptStatus) => {
-      if (acceptStatus) {
-        invitedUser.client.join(roomName);
-        roomManager.getRoomByName(roomName).addMember(invitedUser);
-        invitedUser.client.emit(`enterRoom`, roomName);
-      }
-    }
+    formattedMessage.host = roomName;
 
     client.to(invitedUser.id).emit(`invite:query`, formattedMessage);
   }
 
+  const handleInvitationAccept = (host, guest, cb) => {
+    roomManager.addMemberToRoom(clientManager.getUserByName(guest), host);
+    cb(roomManager.getRoomByName(host).getProps());
+  }
 
   const handlePostMessage = (roomName, text) => {
     const room = roomManager.getRoomByName(roomName);
@@ -82,7 +79,8 @@ const makeHandlers = (client, clientManager, roomManager) => {
     handleGetUsers,
     handleInviteEmit,
     handlePostMessage,
-    handleDisconnect
+    handleDisconnect,
+    handleInvitationAccept
   }
 }
 

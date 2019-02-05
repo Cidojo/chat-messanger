@@ -35,8 +35,12 @@ const initSocketCli = (nsp) => {
     client.emit(`users:get`, cb);
   }
 
-  const handleInvite = (to, room) => {
-    client.emit(`invite:emit`, to, room);
+  const handleInvite = (host, room) => {
+    client.emit(`invite:emit`, host, room);
+  }
+
+  const onInvitationAccept = (host, guest, cb) => {
+    client.emit(`invite:accept`, host, guest, cb);
   }
 
   const onInvitation = (cb) => {
@@ -60,6 +64,7 @@ const initSocketCli = (nsp) => {
     refreshRoom,
     enterRoomHandler,
     onNewUser,
+    onInvitationAccept,
     onInvitation
   }
 }

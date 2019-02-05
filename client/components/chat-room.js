@@ -31,6 +31,7 @@ class ChatRoom extends React.Component {
     this.onChangeRoom = this.onChangeRoom.bind(this);
     this.handleChatScreenToggle = this.handleChatScreenToggle.bind(this);
     this.getCurrentRoom = this.getCurrentRoom.bind(this);
+    this.onInvitationAccept = this.onInvitationAccept.bind(this);
 
 
     this.socketCli = this.props.location.socketCli;
@@ -45,37 +46,40 @@ class ChatRoom extends React.Component {
 
   render() {
     return (
-      <main className="chat-room container">
-      <ul className="chat-room__toggle-bar">
-        {this.state.rooms.map((room , i) => {
-          return (
-            <li key={i} className="chat-room__toggle">
-              <label>
-                {room.name}
-                <input
-                  type="radio"
-                  name="chat-room__toggle"
-                  value={room.name}
-                  onChange={this.handleChatScreenToggle}
-                  defaultChecked={i === this.state.currentRoomIndex}
-                />
-              </label>
+      <div className="chat-room">
+        <ul className="chat-room__toggle-bar">
+          {this.state.rooms.map((room , i) => {
+            return (
+              <li key={i} className="chat-room__toggle">
+                <label>
+                  {room.name}
+                  <input
+                    type="radio"
+                    name="chat-room__toggle"
+                    className="visually-hidden"
+                    value={room.name}
+                    onChange={this.handleChatScreenToggle}
+                    defaultChecked={i === this.state.currentRoomIndex}
+                  />
+                </label>
+              </li>
+            )
+          })}
+        </ul>
+        <div className="chat-room__window">
+          <ul className="chat-room__list">
+            <li className={`chat-room__item`}>
+              <h3 className="chat-room__title">Chat Room: {this.getCurrentRoom().name}</h3>
+              <div className="chat-room__container">
+                <Messages messages={this.state.messages} onAccept={this.onInvitationAccept} />
+                <ChatInput onPostMessage={this.postMessage} />
+              </div>
+              <RoomUsersList ref={this.roomUserList} members={this.getCurrentRoom().members} />
             </li>
-          )
-        })}
-      </ul>
-      <ul className="chat-room__list">
-        <li className={`chat-room__item`}>
-          <h3 className="chat-room__title">Chat Room: {this.getCurrentRoom().name}</h3>
-          <div className="chat-room__container">
-            <Messages messages={this.state.messages} />
-            <ChatInput onPostMessage={this.postMessage} />
-          </div>
-        </li>
-        <RoomUsersList ref={this.roomUserList} members={this.getCurrentRoom().members} />
-        <GlobalUsersList ref={this.globalUserList} users={this.state.globalUserList} onInvite={this.invite} />
-      </ul>
-      </main>
+          </ul>
+        </div>
+        <GlobalUsersList ref={this.globalUserList} users={this.state.globalUserList} self={this.state.username} onInvite={this.invite} />
+      </div>
     );
   }
 
@@ -107,16 +111,25 @@ class ChatRoom extends React.Component {
   }
 
   invite(to) {
-    this.socketCli.handleInvite(to, this.getCurrentRoom().name);
+    if(to !== this.state.username) {
+      this.socketCli.handleInvite(to, this.getCurrentRoom().name);
+    }
+  }
+
+  onInvitationAccept(e) {
+    this.socketCli.onInvitationAccept(e.target.value, this.state.username, this.onChangeRoom);
   }
 
   onChangeRoom(room) {
     const rooms = this.state.rooms;
+    const newIndex = rooms.length;
 
     rooms.push(room);
+
     this.setState({
       rooms,
-      currentRoom: room
+      messages: room.chatHistory,
+      currentRoomIndex: newIndex
     });
   }
 }

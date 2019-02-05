@@ -1,16 +1,25 @@
-.users-list {
-  width: 100px;
+.global-users__list {
   box-sizing: border-box;
 
-  margin: 0;
   padding: 5px;
 
-  list-style: none;
-
   border: 1px solid #000;
-  border-left: none;
 }
 
-.users-list li {
+.global-users__item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.global-users__item button {
+  flex-shrink: 1;
+
+  color: #1131ab;
+
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  text-decoration: underline;
+
   cursor: pointer;
 }

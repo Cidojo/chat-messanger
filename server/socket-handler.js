@@ -13,7 +13,8 @@ const socketHandler = (io) => {
       handleGetUsers,
       handleInviteEmit,
       handlePostMessage,
-      handleDisconnect
+      handleDisconnect,
+      handleInvitationAccept
     } = makeHandlers(client, clientManager, roomManager);
 
     console.log(`${client.id} connected...`); // eslint-disable-line
@@ -28,7 +29,7 @@ const socketHandler = (io) => {
 
     client.on(`invite:emit`, handleInviteEmit);
 
-    // client.on(`invite:message`, handleInviteMessage);
+    client.on(`invite:accept`, handleInvitationAccept);
 
     client.on(`message:post`, handlePostMessage);
 

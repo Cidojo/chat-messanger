@@ -28,7 +28,7 @@ class RoomUsersList extends React.Component {
       )})
 
     return (
-      <ul className="users-list">Room users:
+      <ul className="room-users__list">Room users:
         {members}
       </ul>
     );

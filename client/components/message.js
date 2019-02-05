@@ -20,6 +20,10 @@ class Message extends React.Component {
           <span className="message__body">
             {this.state.message.text}
           </span>
+          {this.state.message.host ?
+            <button onClick={this.props.onAccept} value={this.state.message.host} >Accept</button> :
+          ``
+          }
         </li>
       );
     }
@@ -27,6 +31,7 @@ class Message extends React.Component {
 
   Message.propTypes = {
     message: PropTypes.any,
+    onAccept: PropTypes.func
   }
 
   export default Message;

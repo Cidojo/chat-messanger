@@ -15,6 +15,7 @@ class Messages extends React.Component {
             <Message
               key={i}
               message={message}
+              onAccept={this.props.onAccept}
             />
           );
         });
@@ -34,7 +35,8 @@ class Messages extends React.Component {
   }
 
 Messages.propTypes = {
-  messages: PropTypes.any
+  messages: PropTypes.any,
+  onAccept: PropTypes.func
 }
 
 export default Messages;

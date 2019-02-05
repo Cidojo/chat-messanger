@@ -1,0 +1,20 @@
+.container {
+  width: 1000px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  clip: rect(0 0 0 0);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
