@@ -16,7 +16,7 @@ class GlobalUsersList extends React.Component {
   }
 
   render() {
-    const users = this.state.users.map((user, i) => {
+    const users = this.state.users.slice(0).map((user, i) => {
       return (
         <li
         key={i}

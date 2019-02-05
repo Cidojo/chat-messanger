@@ -15,7 +15,7 @@ class RoomUsersList extends React.Component {
   }
 
   render() {
-    const members = this.props.members.map((member, i) => {
+    const members = this.props.members.slice(0).map((member, i) => {
       return (
         <li
         key={i}

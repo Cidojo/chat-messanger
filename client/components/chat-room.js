@@ -45,26 +45,28 @@ class ChatRoom extends React.Component {
   }
 
   render() {
+    const toggleBar = this.state.rooms.slice(0).map((room , i) => {
+        return (
+          <li key={i} className="chat-room__toggle">
+            <label>
+              {room.name}
+              <input
+                type="radio"
+                name="chat-room__toggle"
+                className="visually-hidden"
+                value={room.name}
+                onChange={this.handleChatScreenToggle}
+                checked={i === this.state.currentRoomIndex}
+              />
+            </label>
+          </li>
+        )
+      });
+
     return (
       <div className="chat-room">
         <ul className="chat-room__toggle-bar">
-          {this.state.rooms.map((room , i) => {
-            return (
-              <li key={i} className="chat-room__toggle">
-                <label>
-                  {room.name}
-                  <input
-                    type="radio"
-                    name="chat-room__toggle"
-                    className="visually-hidden"
-                    value={room.name}
-                    onChange={this.handleChatScreenToggle}
-                    defaultChecked={i === this.state.currentRoomIndex}
-                  />
-                </label>
-              </li>
-            )
-          })}
+          {toggleBar}
         </ul>
         <div className="chat-room__window">
           <ul className="chat-room__list">
@@ -88,8 +90,11 @@ class ChatRoom extends React.Component {
   }
 
   handleChatScreenToggle(e) {
-    const currentRoomIndex = this.state.rooms.findIndex((room) => room.name === e.currentTarget.value);
-    this.setState({currentRoomIndex});
+    const currentRoomIndex = this.state.rooms.findIndex((room) => room.name === e.target.value);
+    this.setState({
+      currentRoomIndex,
+      messages: this.getCurrentRoom().chatHistory
+    });
   }
 
   postMessage(message) {
