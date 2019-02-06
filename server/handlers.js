@@ -23,6 +23,7 @@ const makeHandlers = (client, clientManager, roomManager) => {
       cb(false);
     }
 
+// for simplicity room props equals to user's name and id
     const roomName = name;
     const roomID = client.id;
 
@@ -33,10 +34,6 @@ const makeHandlers = (client, clientManager, roomManager) => {
 
     const newUserFormattedMessage = getFormattedMessage(`User ${name} joined global chat...`, MessageType.SYSTEM);
     client.broadcast.emit(`message:new-user`, newUserFormattedMessage);
-  }
-
-  const handleGetMembers = (roomProps, cb) => {
-    cb(roomManager.getRoomByName(roomProps.name).getMembers());
   }
 
   const handleGetUsers = (cb) => {
@@ -75,7 +72,6 @@ const makeHandlers = (client, clientManager, roomManager) => {
 
   return {
     handleRegister,
-    handleGetMembers,
     handleGetUsers,
     handleInviteEmit,
     handlePostMessage,

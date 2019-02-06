@@ -1,7 +1,7 @@
 const socketClient = require('socket.io-client');
 
-const initSocketCli = (nsp) => {
-  const client = socketClient(nsp);
+const initSocketCli = () => {
+  const client = socketClient();
 
   const registerName = (name, cb) => {
     client.emit(`register`, name, cb);

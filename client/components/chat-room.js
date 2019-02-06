@@ -16,6 +16,7 @@ class ChatRoom extends React.Component {
       rooms: [this.props.location.initialRoom],
       globalUserList: [],
       messages: this.props.location.initialRoom.chatHistory,
+      members: this.props.location.initialRoom.members,
       currentRoomIndex: 0
     };
 
@@ -134,6 +135,7 @@ class ChatRoom extends React.Component {
     this.setState({
       rooms,
       messages: room.chatHistory,
+      members: room.members,
       currentRoomIndex: newIndex
     });
   }

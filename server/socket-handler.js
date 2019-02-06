@@ -9,7 +9,6 @@ const socketHandler = (io) => {
   io.on(`connection`, (client) => {
     const {
       handleRegister,
-      handleGetMembers,
       handleGetUsers,
       handleInviteEmit,
       handlePostMessage,
@@ -22,8 +21,6 @@ const socketHandler = (io) => {
     clientManager.add(client);
 
     client.on(`register`, handleRegister);
-
-    client.on(`members:get`, handleGetMembers);
 
     client.on(`users:get`, handleGetUsers);
 
