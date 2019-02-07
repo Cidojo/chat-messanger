@@ -7,16 +7,20 @@ const initSocketCli = () => {
     client.emit(`register`, name, cb);
   }
 
+  const fetchRoom = (roomName, cb) => {
+    client.emit(`fetch:room`, roomName, cb);
+  }
+
+  const postMessage = (roomName, text) => {
+    client.emit(`message:post`, roomName, text);
+  }
+
   const refreshGlobal = (cb) => {
     client.on(`refresh:global`, cb);
   }
 
   const refreshRoom = (cb) => {
     client.on(`refresh:room`, cb);
-  }
-
-  const handlePostMessage = (roomName, text) => {
-    client.emit(`message:post`, roomName, text);
   }
 
   const onNewUser = (cb) => {
@@ -26,8 +30,8 @@ const initSocketCli = () => {
   }
 
   const onGetMessage = (cb) => {
-    client.on(`message:get`, (message) => {
-      cb(message);
+    client.on(`message:get`, (roomName, message) => {
+      cb(roomName, message);
     });
   }
 
@@ -35,7 +39,7 @@ const initSocketCli = () => {
     client.emit(`users:get`, cb);
   }
 
-  const handleInvite = (host, room) => {
+  const invite = (host, room) => {
     client.emit(`invite:emit`, host, room);
   }
 
@@ -43,29 +47,35 @@ const initSocketCli = () => {
     client.emit(`invite:accept`, host, guest, cb);
   }
 
-  const onInvitation = (cb) => {
+  const onInvite = (cb) => {
     client.on(`invite:query`, (message) => {
       cb(message);
     });
   }
 
-  const enterRoomHandler = (cb) => {
+  const enterRoom = (cb) => {
     client.on(`enterRoom`, cb);
+  }
+
+  const onServerData = (cb) => {
+    client.on(`server-data:fetch`, cb);
   }
 
   return {
     client,
     getGlobalUserList,
-    handleInvite,
+    invite,
     registerName,
-    handlePostMessage,
+    postMessage,
     onGetMessage,
     refreshGlobal,
     refreshRoom,
-    enterRoomHandler,
+    enterRoom,
     onNewUser,
     onInvitationAccept,
-    onInvitation
+    onInvite,
+    fetchRoom,
+    onServerData
   }
 }
 

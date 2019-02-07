@@ -15,13 +15,20 @@ class RoomManager {
   }
 
   addMemberToRoom(member, roomName) {
-    member.client.join(roomName);
+    member.client.join(roomName, () => {
+      console.log(Object.keys(member.client.rooms));
+    });
+
+    console.log(Object.keys(member.client.rooms));
+
     this.getRoomByName(roomName).addMember(member);
   }
 
   deleteMemberFromRooms(user) {
+    console.log(Object.keys(user.client.rooms));
     Object.keys(user.client.rooms).forEach((room, i) => {
       const chat = this.getRoomByName(room);
+      console.log(room);
       if (i > 0) {
         chat.deleteMember(chat.members.get(user.client.id));
       }
@@ -53,6 +60,12 @@ class RoomManager {
 
   getRooms() {
     return [...this.rooms.values()].map((room) => room.name);
+  }
+
+  getAllRoomsProps() {
+    return [...this.rooms.values()].map((room) => {
+      return room.getProps();
+    });
   }
 }
 

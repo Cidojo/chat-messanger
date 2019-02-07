@@ -56,7 +56,7 @@ class Login extends React.Component {
   usernameSubmitHandler(evt) {
     evt.preventDefault();
 
-    const getRegisterState = (nameAvailiabilityState, room) => {
+    const onRegisterAnswer = (nameAvailiabilityState, room) => {
       if (nameAvailiabilityState) {
         this.setState({
           registered: true,
@@ -69,7 +69,7 @@ class Login extends React.Component {
       }
     }
 
-    this.socketCli.registerName(this.state.username, getRegisterState.bind(this));
+    this.socketCli.registerName(this.state.username, onRegisterAnswer.bind(this));
 
   }
 }

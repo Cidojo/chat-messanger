@@ -13,9 +13,9 @@ class Room {
     }
   }
 
-  broadcastMessage(message) {
+  broadcastMessage() {
     this.members.forEach((member) => {
-      member.client.emit(`message:get`, message);
+      member.client.emit(`message:get`, this.getProps());
     });
   }
 

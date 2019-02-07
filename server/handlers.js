@@ -14,7 +14,19 @@ const getFormattedMessage = (text, type) => {
   };
 }
 
-const makeHandlers = (client, clientManager, roomManager) => {
+const makeHandlers = (io, client, clientManager, roomManager) => {
+
+  const handleUpdateServerData = () => {
+    const data = {
+      users: {
+        connected: clientManager.getAllUsers(),
+        registered: clientManager.getRegisteredUsers()
+      },
+      rooms: roomManager.getAllRoomsProps()
+    }
+
+    io.emit(`server-data:fetch`, data);
+  }
 
   const handleRegister = (name, cb) => {
     try {
@@ -23,7 +35,7 @@ const makeHandlers = (client, clientManager, roomManager) => {
       cb(false);
     }
 
-// for simplicity room props equals to user's name and id
+// for simplicity room name & id equals to user's name & id
     const roomName = name;
     const roomID = client.id;
 
@@ -34,6 +46,8 @@ const makeHandlers = (client, clientManager, roomManager) => {
 
     const newUserFormattedMessage = getFormattedMessage(`User ${name} joined global chat...`, MessageType.SYSTEM);
     client.broadcast.emit(`message:new-user`, newUserFormattedMessage);
+
+    handleUpdateServerData();
   }
 
   const handleGetUsers = (cb) => {
@@ -52,6 +66,8 @@ const makeHandlers = (client, clientManager, roomManager) => {
   const handleInvitationAccept = (host, guest, cb) => {
     roomManager.addMemberToRoom(clientManager.getUserByName(guest), host);
     cb(roomManager.getRoomByName(host).getProps());
+
+    handleUpdateServerData();
   }
 
   const handlePostMessage = (roomName, text) => {
@@ -61,6 +77,12 @@ const makeHandlers = (client, clientManager, roomManager) => {
 
     room.addEntry(formattedMessage);
     room.broadcastMessage(formattedMessage);
+
+    handleUpdateServerData();
+  }
+
+  const handleFetchRoom = (roomName, cb) => {
+    cb(roomManager.getRoomByName(roomName).getProps());
   }
 
   const handleDisconnect = () => {
@@ -68,6 +90,8 @@ const makeHandlers = (client, clientManager, roomManager) => {
     clientManager.delete(client);
 
     console.log(`${client.id} has disconnected...`); // eslint-disable-line
+
+    handleUpdateServerData();
   }
 
   return {
@@ -76,7 +100,9 @@ const makeHandlers = (client, clientManager, roomManager) => {
     handleInviteEmit,
     handlePostMessage,
     handleDisconnect,
-    handleInvitationAccept
+    handleInvitationAccept,
+    handleFetchRoom,
+    handleUpdateServerData
   }
 }
 

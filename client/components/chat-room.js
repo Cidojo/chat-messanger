@@ -4,6 +4,7 @@ import Messages from './messages';
 import ChatInput from './chat-input';
 import RoomUsersList from './room-users-list';
 import GlobalUsersList from './global-users-list';
+import ServerData from './server-data';
 import './chat-room.css';
 
 
@@ -13,49 +14,62 @@ class ChatRoom extends React.Component {
 
     this.state = {
       username: this.props.location.username,
-      rooms: [this.props.location.initialRoom],
+      room: this.props.location.initialRoom,
+      rooms: [this.props.location.initialRoom.name],
       globalUserList: [],
-      messages: this.props.location.initialRoom.chatHistory,
-      members: this.props.location.initialRoom.members,
-      currentRoomIndex: 0
+      currentRoomIndex: 0,
+      serverData: {
+        users: {
+          connected: [],
+          registered: []
+        },
+        rooms: []
+      }
     };
 
     this.roomUserList = React.createRef();
     this.globalUserList = React.createRef();
 
-
     this.updateMemberList = this.updateMemberList.bind(this);
     this.updateGlobalUserList = this.updateGlobalUserList.bind(this);
+
     this.postMessage = this.postMessage.bind(this);
-    this.getMessage = this.getMessage.bind(this);
-    this.invite = this.invite.bind(this);
-    this.onChangeRoom = this.onChangeRoom.bind(this);
+    this.getUserMessage = this.getUserMessage.bind(this);
+    this.getSystemMessage = this.getSystemMessage.bind(this);
+
+    this.handleInvite = this.handleInvite.bind(this);
+    this.handleChangeRoom = this.handleChangeRoom.bind(this);
     this.handleChatScreenToggle = this.handleChatScreenToggle.bind(this);
-    this.getCurrentRoom = this.getCurrentRoom.bind(this);
     this.onInvitationAccept = this.onInvitationAccept.bind(this);
+
+    this.onServerData = this.onServerData.bind(this);
 
 
     this.socketCli = this.props.location.socketCli;
     this.socketCli.getGlobalUserList(this.updateGlobalUserList);
-    this.socketCli.onGetMessage(this.getMessage);
     this.socketCli.refreshGlobal(this.updateGlobalUserList);
     this.socketCli.refreshRoom(this.updateMemberList);
-    this.socketCli.enterRoomHandler(this.onChangeRoom);
-    this.socketCli.onNewUser(this.getMessage);
-    this.socketCli.onInvitation(this.getMessage);
+    this.socketCli.enterRoom(this.handleChangeRoom);
+    this.socketCli.onGetMessage(this.getUserMessage);
+    this.socketCli.onNewUser(this.getUserMessage);
+
+    this.socketCli.onInvite(this.getSystemMessage);
+
+
+    this.socketCli.onServerData(this.onServerData);
   }
 
   render() {
-    const toggleBar = this.state.rooms.slice(0).map((room , i) => {
+    const toggleBar = this.state.rooms.slice(0).map((roomName, i) => {
         return (
           <li key={i} className="chat-room__toggle">
             <label>
-              {room.name}
+              {roomName}
               <input
                 type="radio"
                 name="chat-room__toggle"
                 className="visually-hidden"
-                value={room.name}
+                value={roomName}
                 onChange={this.handleChatScreenToggle}
                 checked={i === this.state.currentRoomIndex}
               />
@@ -72,38 +86,56 @@ class ChatRoom extends React.Component {
         <div className="chat-room__window">
           <ul className="chat-room__list">
             <li className={`chat-room__item`}>
-              <h3 className="chat-room__title">Chat Room: {this.getCurrentRoom().name}</h3>
+              <h3 className="chat-room__title">Chat Room: {this.state.room.name}</h3>
               <div className="chat-room__container">
-                <Messages messages={this.state.messages} onAccept={this.onInvitationAccept} />
+                <Messages messages={this.state.room.chatHistory} onAccept={this.onInvitationAccept} />
                 <ChatInput onPostMessage={this.postMessage} />
               </div>
-              <RoomUsersList ref={this.roomUserList} members={this.getCurrentRoom().members} />
+              <RoomUsersList ref={this.roomUserList} members={this.state.room.members} />
             </li>
           </ul>
         </div>
-        <GlobalUsersList ref={this.globalUserList} users={this.state.globalUserList} self={this.state.username} onInvite={this.invite} />
+        <GlobalUsersList ref={this.globalUserList} users={this.state.globalUserList} self={this.state.username} handleInvite={this.handleInvite} />
+        <ServerData serverData={this.state.serverData} />
       </div>
     );
   }
 
-  getCurrentRoom() {
-    return this.state.rooms[this.state.currentRoomIndex];
+  onServerData(serverData) {
+    this.setState({
+      serverData
+    })
   }
 
   handleChatScreenToggle(e) {
-    const currentRoomIndex = this.state.rooms.findIndex((room) => room.name === e.target.value);
-    this.setState({
-      currentRoomIndex,
-      messages: this.getCurrentRoom().chatHistory
-    });
+    this.socketCli.fetchRoom(e.target.value, (room) => this.setState({
+      room,
+      currentRoomIndex: this.state.rooms.indexOf(room.name)
+    }));
   }
 
   postMessage(message) {
-    this.socketCli.handlePostMessage(this.getCurrentRoom().name, message);
+    this.socketCli.postMessage(this.state.room.name, message);
   }
 
-  getMessage(message) {
-    this.setState({messages: [...this.state.messages, message]});
+  getUserMessage(room) {
+    const roomIndex = this.state.rooms.indexOf(room.name);
+
+    if (roomIndex === this.state.currentRoomIndex) {
+      this.setState({
+        room
+      });
+    }
+  }
+
+  getSystemMessage(message) {
+    const rooms = this.state.rooms.slice(0);
+    rooms.forEach((room) => room.chatHistory.push(message));
+
+    this.setState({
+      messages: [...this.state.messages, message],
+      rooms
+    });
   }
 
   updateMemberList(list) {
@@ -116,9 +148,9 @@ class ChatRoom extends React.Component {
     this.globalUserList.current.updateList(list);
   }
 
-  invite(to) {
+  handleInvite(to) {
     if(to !== this.state.username) {
-      this.socketCli.handleInvite(to, this.getCurrentRoom().name);
+      this.socketCli.invite(to, this.room.name);
     }
   }
 
@@ -126,17 +158,10 @@ class ChatRoom extends React.Component {
     this.socketCli.onInvitationAccept(e.target.value, this.state.username, this.onChangeRoom);
   }
 
-  onChangeRoom(room) {
-    const rooms = this.state.rooms;
-    const newIndex = rooms.length;
-
-    rooms.push(room);
-
+  handleChangeRoom(room) {
     this.setState({
-      rooms,
-      messages: room.chatHistory,
-      members: room.members,
-      currentRoomIndex: newIndex
+      room,
+      currentRoomIndex: this.state.rooms.indexOf(room.name)
     });
   }
 }

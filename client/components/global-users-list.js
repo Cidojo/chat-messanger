@@ -23,7 +23,7 @@ class GlobalUsersList extends React.Component {
         className="global-users__item"
         >
           {user}
-          {this.state.self === user ? `` : <button onClick={this.onInvite.bind(this, user)}>invite</button>}
+          {this.state.self === user ? `` : <button onClick={this.invite.bind(this, user)}>invite</button>}
         </li>
       )})
 
@@ -34,8 +34,8 @@ class GlobalUsersList extends React.Component {
     );
   }
 
-  onInvite(user) {
-    this.props.onInvite(user);
+  invite(user) {
+    this.props.handleInvite(user);
   }
 
   updateList(list) {
@@ -45,7 +45,7 @@ class GlobalUsersList extends React.Component {
 
 GlobalUsersList.propTypes = {
   users: PropTypes.array,
-  onInvite: PropTypes.func,
+  handleInvite: PropTypes.func,
   self: PropTypes.string
 }
 
