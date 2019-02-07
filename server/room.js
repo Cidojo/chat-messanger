@@ -13,12 +13,6 @@ class Room {
     }
   }
 
-  broadcastMessage() {
-    this.members.forEach((member) => {
-      member.client.emit(`message:get`, this.getProps());
-    });
-  }
-
   addEntry(entry) {
     this.chatHistory.push(entry);
   }
@@ -29,19 +23,23 @@ class Room {
 
   addMember(member) {
     this.members.set(member.id, member);
-    this.refreshMemberList(member.client);
+    this.refreshMembersList(member.client);
   }
 
   deleteMember(member) {
     this.members.delete(member.id);
-    this.refreshMemberList(member.client);
+    this.refreshMembersList(member.client);
   }
 
-  getMemberList() {
+  getMembers() {
+    return this.members;
+  }
+
+  getMembersList() {
     return [...this.members.values()].map((member) => member.name);
   }
 
-  refreshMemberList(client) {
+  refreshMembersList(client) {
     client.to(this.name).emit(`refresh:room`, this.getMemberList());
   }
 }

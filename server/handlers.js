@@ -16,47 +16,33 @@ const getFormattedMessage = (text, type) => {
 
 const makeHandlers = (io, client, clientManager, roomManager) => {
 
-  const handleUpdateServerData = () => {
-    const data = {
-      users: {
-        connected: clientManager.getAllUsers(),
-        registered: clientManager.getRegisteredUsers()
-      },
-      rooms: roomManager.getAllRoomsProps()
-    }
-
-    io.emit(`server-data:fetch`, data);
-  }
-
   const handleRegister = (name, cb) => {
     try {
       clientManager.register(client.id, name);
     } catch (e) {
       cb(false);
     }
-
-// for simplicity room name & id equals to user's name & id
+    // for simplicity room name & id equals to user's name & id
     const roomName = name;
     const roomID = client.id;
 
-    roomManager.addRoom(roomID, roomName);
-    roomManager.addMemberToRoom(clientManager.allUsers.get(client.id), roomName);
+    const room = roomManager.addRoom(roomID, roomName);
+    room.addMember(clientManager.getClientById(client.id));
+    clientManager.addRoomToClient(room);
 
-    cb(true, roomManager.getRoomByID(roomID).getProps());
+    cb(true, room.getProps());
 
     const newUserFormattedMessage = getFormattedMessage(`User ${name} joined global chat...`, MessageType.SYSTEM);
     client.broadcast.emit(`message:new-user`, newUserFormattedMessage);
-
-    handleUpdateServerData();
   }
 
   const handleGetUsers = (cb) => {
-    cb(clientManager.getGlobalUsersList());
+    cb(clientManager.getRegisteredClients());
   }
 
   const handleInviteEmit = (invitedUserName, roomName) => {
-    const emitter = clientManager.getUserById(client.id);
-    const invitedUser = clientManager.getUserByName(invitedUserName);
+    const emitter = clientManager.getClientById(client.id);
+    const invitedUser = clientManager.getClientByName(invitedUserName);
     const formattedMessage = getFormattedMessage(`${emitter.name} invites you to join ${roomName} Chat...`, MessageType.INVITATION);
     formattedMessage.host = roomName;
 
@@ -64,34 +50,32 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
   }
 
   const handleInvitationAccept = (host, guest, cb) => {
-    roomManager.addMemberToRoom(clientManager.getUserByName(guest), host);
-    cb(roomManager.getRoomByName(host).getProps());
+    const room = roomManager.getRoomByName(host);
 
-    handleUpdateServerData();
+    room.addMember(clientManager.getClientByName(guest));
+    cb(room.getProps());
   }
 
   const handlePostMessage = (roomName, text) => {
     const room = roomManager.getRoomByName(roomName);
     const formattedMessage = getFormattedMessage(text, MessageType.USER);
-    formattedMessage.from = clientManager.getUserById(client.id).name;
+
+    formattedMessage.from = clientManager.getClientById(client.id).name;
 
     room.addEntry(formattedMessage);
-    room.broadcastMessage(formattedMessage);
-
-    handleUpdateServerData();
-  }
-
-  const handleFetchRoom = (roomName, cb) => {
-    cb(roomManager.getRoomByName(roomName).getProps());
+    room.getMembers().forEach((member) => {
+      member.client.emit(`message:get`, formattedMessage);
+    })
   }
 
   const handleDisconnect = () => {
-    roomManager.deleteMemberFromRooms(clientManager.getUserById(client.id));
+    clientManager.getClientById(client.id).rooms.forEach((room) => {
+      room.deleteClient(client.id);
+    });
+
     clientManager.delete(client);
 
     console.log(`${client.id} has disconnected...`); // eslint-disable-line
-
-    handleUpdateServerData();
   }
 
   return {
@@ -100,9 +84,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     handleInviteEmit,
     handlePostMessage,
     handleDisconnect,
-    handleInvitationAccept,
-    handleFetchRoom,
-    handleUpdateServerData
+    handleInvitationAccept
   }
 }
 

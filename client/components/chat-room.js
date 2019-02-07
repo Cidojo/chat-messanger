@@ -14,10 +14,11 @@ class ChatRoom extends React.Component {
 
     this.state = {
       username: this.props.location.username,
-      room: this.props.location.initialRoom,
-      rooms: [this.props.location.initialRoom.name],
+      current: this.props.location.initialRoom,
+      rooms: [this.props.location.initialRoom],
       globalUserList: [],
-      currentRoomIndex: 0,
+      messages: [],
+
       serverData: {
         users: {
           connected: [],
@@ -60,18 +61,18 @@ class ChatRoom extends React.Component {
   }
 
   render() {
-    const toggleBar = this.state.rooms.slice(0).map((roomName, i) => {
+    const toggleBar = this.state.rooms.slice(0).map((room, i) => {
         return (
           <li key={i} className="chat-room__toggle">
             <label>
-              {roomName}
+              {room.name}
               <input
                 type="radio"
                 name="chat-room__toggle"
                 className="visually-hidden"
-                value={roomName}
+                value={room.name}
                 onChange={this.handleChatScreenToggle}
-                checked={i === this.state.currentRoomIndex}
+                checked={this.state.room.name === room.name}
               />
             </label>
           </li>
@@ -88,10 +89,10 @@ class ChatRoom extends React.Component {
             <li className={`chat-room__item`}>
               <h3 className="chat-room__title">Chat Room: {this.state.room.name}</h3>
               <div className="chat-room__container">
-                <Messages messages={this.state.room.chatHistory} onAccept={this.onInvitationAccept} />
+                <Messages messages={this.state.messages} onAccept={this.onInvitationAccept} />
                 <ChatInput onPostMessage={this.postMessage} />
               </div>
-              <RoomUsersList ref={this.roomUserList} members={this.state.room.members} />
+              <RoomUsersList ref={this.room.members} members={this.state.room.members} />
             </li>
           </ul>
         </div>
@@ -108,24 +109,20 @@ class ChatRoom extends React.Component {
   }
 
   handleChatScreenToggle(e) {
-    this.socketCli.fetchRoom(e.target.value, (room) => this.setState({
-      room,
-      currentRoomIndex: this.state.rooms.indexOf(room.name)
-    }));
+    const roomIndex = this.state.rooms.findIndex((room) => room.name === e.target.value);
+    this.setState({
+      room: this.state.rooms[roomIndex]
+    })
   }
 
   postMessage(message) {
     this.socketCli.postMessage(this.state.room.name, message);
   }
 
-  getUserMessage(room) {
-    const roomIndex = this.state.rooms.indexOf(room.name);
-
-    if (roomIndex === this.state.currentRoomIndex) {
-      this.setState({
-        room
-      });
-    }
+  getUserMessage(message) {
+    this.setState({
+      messages: [...this.state.messages, message]
+    });
   }
 
   getSystemMessage(message) {
