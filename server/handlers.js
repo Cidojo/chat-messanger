@@ -18,7 +18,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
   const handleRegister = (name, cb) => {
     try {
-      clientManager.register(client.id, name);
+      clientManager.registerClient(client.id, name);
     } catch (e) {
       cb(false);
     }
@@ -28,7 +28,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
     const room = roomManager.addRoom(roomID, roomName);
     room.addMember(clientManager.getClientById(client.id));
-    clientManager.addRoomToClient(room);
+    clientManager.addRoomToClient(client.id, room);
 
     cb(true, room.getProps());
 
@@ -37,7 +37,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
   }
 
   const handleGetUsers = (cb) => {
-    cb(clientManager.getRegisteredClients());
+    cb(clientManager.getRegisteredClientsList());
   }
 
   const handleInviteEmit = (invitedUserName, roomName) => {
@@ -70,10 +70,10 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
   const handleDisconnect = () => {
     clientManager.getClientById(client.id).rooms.forEach((room) => {
-      room.deleteClient(client.id);
+      room.deleteMember(client.id);
     });
 
-    clientManager.delete(client);
+    clientManager.deleteClient(client.id);
 
     console.log(`${client.id} has disconnected...`); // eslint-disable-line
   }

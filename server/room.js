@@ -8,7 +8,7 @@ class Room {
   getProps() {
     return {
       name: this.name,
-      members: this.getMemberList(),
+      members: this.getMembersList(),
       chatHistory: this.getChatHistory()
     }
   }
@@ -23,12 +23,10 @@ class Room {
 
   addMember(member) {
     this.members.set(member.id, member);
-    this.refreshMembersList(member.client);
   }
 
-  deleteMember(member) {
-    this.members.delete(member.id);
-    this.refreshMembersList(member.client);
+  deleteMember(id) {
+    this.members.delete(id);
   }
 
   getMembers() {
@@ -37,10 +35,6 @@ class Room {
 
   getMembersList() {
     return [...this.members.values()].map((member) => member.name);
-  }
-
-  refreshMembersList(client) {
-    client.to(this.name).emit(`refresh:room`, this.getMemberList());
   }
 }
 

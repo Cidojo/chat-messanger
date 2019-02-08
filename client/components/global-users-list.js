@@ -8,15 +8,12 @@ class GlobalUsersList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      self: this.props.self,
-      users: this.props.users
+      self: this.props.self
     }
-
-    this.updateList = this.updateList.bind(this);
   }
 
   render() {
-    const users = this.state.users.slice(0).map((user, i) => {
+    const users = this.props.users.slice(0).map((user, i) => {
       return (
         <li
         key={i}
@@ -36,10 +33,6 @@ class GlobalUsersList extends React.Component {
 
   invite(user) {
     this.props.handleInvite(user);
-  }
-
-  updateList(list) {
-    this.setState({users: list});
   }
 }
 

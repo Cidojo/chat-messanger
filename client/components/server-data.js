@@ -8,7 +8,6 @@ class ServerData extends React.Component {
     this.state = {
       serverData: this.props.serverData
     };
-    debugger
   }
   render() {
     return (

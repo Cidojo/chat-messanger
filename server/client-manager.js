@@ -1,9 +1,6 @@
 class ClientManager {
   constructor() {
     this.allClients = new Map();
-
-    this.isNameTaken = this.isNameTaken.bind(this);
-    this.register = this.register.bind(this);
   }
 
   addClient(client) {
@@ -16,7 +13,6 @@ class ClientManager {
 
   deleteClient(id) {
     this.allClients.delete(id);
-    this.refreshGlobalUserList(this.getClientById(id));
   }
 
   registerClient(id, name) {
@@ -24,25 +20,11 @@ class ClientManager {
       throw new Error(`Name taken`);
     }
 
-    const user = this.getClientById(id);
-    user.name = name;
-    this.registeredUsers.set(id, user);
-
-    this.refreshGlobalUserList(user.client);
+    this.getClientById(id).name = name;
   }
 
   getClientByName(name) {
-    let userIterMap = this.registeredUsers.values();
-
-    for (let i = 0; i < this.registeredUsers.size; i++) {
-      let current = userIterMap.next().value;
-
-      if (current.name === name) {
-        return current;
-      }
-    }
-
-    throw new Error(`No such client`);
+    return this.getRegisteredClients(name).find((client) => client.name === client);
   }
 
   getClientById(id) {
@@ -50,11 +32,21 @@ class ClientManager {
   }
 
   addRoomToClient(id, room) {
-    this.getClientById.rooms.add(room);
+    this.getClientById(id).rooms.add(room);
+  }
+
+  getAllClients() {
+    return [...this.allClients.values()];
   }
 
   getRegisteredClients() {
     return this.getAllClients().filter((client) => {
+      return client.name;
+    });
+  }
+
+  getRegisteredClientsList() {
+    return this.getRegisteredClients().map((client) => {
       return client.name;
     });
   }
