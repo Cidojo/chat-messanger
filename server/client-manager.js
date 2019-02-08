@@ -24,7 +24,7 @@ class ClientManager {
   }
 
   getClientByName(name) {
-    return this.getRegisteredClients(name).find((client) => client.name === client);
+    return this.getRegisteredClients(name).find((client) => client.name === name);
   }
 
   getClientById(id) {

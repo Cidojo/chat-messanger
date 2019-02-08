@@ -13,14 +13,14 @@ class GlobalUsersList extends React.Component {
   }
 
   render() {
-    const users = this.props.users.slice(0).map((user, i) => {
+    const users = this.props.usersList.slice(0).map((user, i) => {
       return (
         <li
         key={i}
         className="global-users__item"
         >
           {user}
-          {this.state.self === user ? `` : <button onClick={this.invite.bind(this, user)}>invite</button>}
+          {this.state.self === user ? `` : <button onClick={this.props.handleInvite.bind(null, user)}>invite</button>}
         </li>
       )})
 
@@ -30,14 +30,10 @@ class GlobalUsersList extends React.Component {
       </ul>
     );
   }
-
-  invite(user) {
-    this.props.handleInvite(user);
-  }
 }
 
 GlobalUsersList.propTypes = {
-  users: PropTypes.array,
+  usersList: PropTypes.array,
   handleInvite: PropTypes.func,
   self: PropTypes.string
 }

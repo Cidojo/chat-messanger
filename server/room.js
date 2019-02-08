@@ -23,9 +23,11 @@ class Room {
 
   addMember(member) {
     this.members.set(member.id, member);
+    member.client.join(this.name);
   }
 
   deleteMember(id) {
+    this.members.get(id).client.leave(this.name);
     this.members.delete(id);
   }
 

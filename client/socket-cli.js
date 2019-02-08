@@ -7,10 +7,6 @@ const initSocketCli = () => {
     client.emit(`register`, name, cb);
   }
 
-  const fetchRoom = (roomName, cb) => {
-    client.emit(`fetch:room`, roomName, cb);
-  }
-
   const postMessage = (roomName, text) => {
     client.emit(`message:post`, roomName, text);
   }
@@ -25,7 +21,7 @@ const initSocketCli = () => {
 
   const onNewUser = (cb) => {
     client.on(`message:new-user`, (message) => {
-      cb(message);
+      cb(null, message);
     });
   }
 
@@ -39,8 +35,12 @@ const initSocketCli = () => {
     client.emit(`users:get`, cb);
   }
 
-  const invite = (host, room) => {
-    client.emit(`invite:emit`, host, room);
+  const fetchRoom = (roomName, cb) => {
+    client.emit(`fetch:room`, roomName, cb);
+  }
+
+  const invite = (invited, roomName) => {
+    client.emit(`invite:emit`, invited, roomName);
   }
 
   const onInvitationAccept = (host, guest, cb) => {
@@ -49,7 +49,7 @@ const initSocketCli = () => {
 
   const onInvite = (cb) => {
     client.on(`invite:query`, (message) => {
-      cb(message);
+      cb(null, message);
     });
   }
 

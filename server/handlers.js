@@ -16,6 +16,7 @@ const getFormattedMessage = (text, type) => {
 
 const makeHandlers = (io, client, clientManager, roomManager) => {
 
+
   const handleRegister = (name, cb) => {
     try {
       clientManager.registerClient(client.id, name);
@@ -36,25 +37,6 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     client.broadcast.emit(`message:new-user`, newUserFormattedMessage);
   }
 
-  const handleGetUsers = (cb) => {
-    cb(clientManager.getRegisteredClientsList());
-  }
-
-  const handleInviteEmit = (invitedUserName, roomName) => {
-    const emitter = clientManager.getClientById(client.id);
-    const invitedUser = clientManager.getClientByName(invitedUserName);
-    const formattedMessage = getFormattedMessage(`${emitter.name} invites you to join ${roomName} Chat...`, MessageType.INVITATION);
-    formattedMessage.host = roomName;
-
-    client.to(invitedUser.id).emit(`invite:query`, formattedMessage);
-  }
-
-  const handleInvitationAccept = (host, guest, cb) => {
-    const room = roomManager.getRoomByName(host);
-
-    room.addMember(clientManager.getClientByName(guest));
-    cb(room.getProps());
-  }
 
   const handlePostMessage = (roomName, text) => {
     const room = roomManager.getRoomByName(roomName);
@@ -63,10 +45,37 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     formattedMessage.from = clientManager.getClientById(client.id).name;
 
     room.addEntry(formattedMessage);
-    room.getMembers().forEach((member) => {
-      member.client.emit(`message:get`, formattedMessage);
-    })
+
+    io.to(roomName).emit(`message:get`, roomName, formattedMessage);
   }
+
+
+  const handleGetUsers = (cb) => {
+    cb(clientManager.getRegisteredClientsList());
+  }
+
+  const handleFetchRoom = (roomName, cb) => {
+    cb(roomManager.getRoomByName(roomName).getProps());
+  }
+
+
+  const handleInviteEmit = (invited, roomName) => {
+    const invitingUser = clientManager.getClientById(client.id);
+    const invitedUser = clientManager.getClientByName(invited);
+    const formattedMessage = getFormattedMessage(`${invitingUser.name} invites you to join ${roomName} Chat Room...`, MessageType.INVITATION);
+    formattedMessage.host = roomName;
+
+    client.to(invitedUser.id).emit(`invite:query`, formattedMessage);
+  }
+
+
+  const handleInvitationAccept = (host, invited, cb) => {
+    const room = roomManager.getRoomByName(host);
+
+    room.addMember(clientManager.getClientByName(invited));
+    cb(room.getProps());
+  }
+
 
   const handleDisconnect = () => {
     clientManager.getClientById(client.id).rooms.forEach((room) => {
@@ -84,7 +93,8 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     handleInviteEmit,
     handlePostMessage,
     handleDisconnect,
-    handleInvitationAccept
+    handleInvitationAccept,
+    handleFetchRoom
   }
 }
 
