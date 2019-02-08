@@ -15,15 +15,14 @@ class ChatRoom extends React.Component {
     this.state = {
       username: this.props.location.username,
       currentRoom: this.props.location.initialRoom,
-      globalUserList: [],
-      messages: []
+      globalUsersList: []
     };
 
     this.roomManager = new RoomManager();
     this.roomManager.addRoom(this.props.location.initialRoom);
 
-    this.updateMemberList = this.updateMemberList.bind(this);
-    this.updateGlobalUserList = this.updateGlobalUserList.bind(this);
+    this.onUpdateMembersList = this.onUpdateMembersList.bind(this);
+    this.onUpdateGlobalUsersList = this.onUpdateGlobalUsersList.bind(this);
 
     this.postMessage = this.postMessage.bind(this);
     this.getUserMessage = this.getUserMessage.bind(this);
@@ -35,17 +34,12 @@ class ChatRoom extends React.Component {
 
 
     this.socketCli = this.props.location.socketCli;
-    this.socketCli.getGlobalUserList(this.updateGlobalUserList);
-    this.socketCli.refreshGlobal(this.updateGlobalUserList);
-    this.socketCli.refreshRoom(this.updateMemberList);
-    this.socketCli.enterRoom(this.handleChangeRoom);
+    this.socketCli.getGlobalUsersList(this.onUpdateGlobalUsersList);
+    this.socketCli.onUpdateGlobalUsersList(this.onUpdateGlobalUsersList);
+    this.socketCli.onUpdateMembersList(this.onUpdateMembersList);
     this.socketCli.onGetMessage(this.getUserMessage);
     this.socketCli.onNewUser(this.getUserMessage);
     this.socketCli.onInvite(this.getUserMessage);
-
-
-
-    this.socketCli.onServerData(this.onServerData);
   }
 
   render() {
@@ -77,14 +71,14 @@ class ChatRoom extends React.Component {
             <li className={`chat-room__item`}>
               <h3 className="chat-room__title">Chat Room: {this.state.currentRoom.name}</h3>
               <div className="chat-room__container">
-                <Messages messages={this.state.messages} onInvitationAccept={this.onInvitationAccept} />
+                <Messages messages={this.state.currentRoom.chatHistory} onInvitationAccept={this.onInvitationAccept} />
                 <ChatInput onPostMessage={this.postMessage} />
               </div>
               <RoomUsersList members={this.state.currentRoom.members} />
             </li>
           </ul>
         </div>
-        <GlobalUsersList usersList={this.state.globalUserList} self={this.state.username} handleInvite={this.handleInvite} />
+        <GlobalUsersList globalUsersList={this.state.globalUsersList} self={this.state.username} handleInvite={this.handleInvite} />
       </div>
     );
   }
@@ -98,22 +92,31 @@ class ChatRoom extends React.Component {
   }
 
   getUserMessage(roomName, message) {
-    const room = message.type !== `user` ? this.state.currentRoom : this.roomManager.getRoom(roomName);
-    room.chatHistory.push(message);
+    roomName = roomName || this.state.currentRoom.name;
 
-    if (this.state.currentRoom.name === roomName || message.type !== `user`) {
-      this.setState({
-        messages: room.chatHistory
-      });
-    }
+    this.setState({
+      currentRoom: {
+        ...this.state.currentRoom,
+        chatHistory: [...this.state.currentRoom.chatHistory, message]
+      }
+    });
+
+    this.roomManager.getRoom(roomName).chatHistory.push(message);
   }
 
-  updateMemberList(list) {
-    this.setState({members: list});
+  onUpdateMembersList(list) {
+    this.setState({
+      currentRoom: {
+        ...this.state.currentRoom,
+        members: list
+      }
+    });
+
+    this.roomManager.getRoom(this.state.currentRoom.name).members = list;
   }
 
-  updateGlobalUserList(list) {
-    this.setState({globalUserList: list});
+  onUpdateGlobalUsersList(list) {
+    this.setState({globalUsersList: list});
   }
 
   handleInvite(invited) {
@@ -121,12 +124,12 @@ class ChatRoom extends React.Component {
   }
 
   onInvitationAccept(e) {
-    const accept = (room) => {
+    const onAccept = (room) => {
       this.roomManager.addRoom(room);
       this.changeRoom(room.name);
     }
 
-    this.socketCli.onInvitationAccept(e.target.value, this.state.username, accept.bind(this));
+    this.socketCli.onInvitationAccept(e.target.value, this.state.username, onAccept.bind(this));
   }
 
   changeRoom(roomName) {

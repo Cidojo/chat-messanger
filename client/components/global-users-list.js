@@ -13,7 +13,7 @@ class GlobalUsersList extends React.Component {
   }
 
   render() {
-    const users = this.props.usersList.slice(0).map((user, i) => {
+    const users = this.props.globalUsersList.map((user, i) => {
       return (
         <li
         key={i}
@@ -33,7 +33,7 @@ class GlobalUsersList extends React.Component {
 }
 
 GlobalUsersList.propTypes = {
-  usersList: PropTypes.array,
+  globalUsersList: PropTypes.array,
   handleInvite: PropTypes.func,
   self: PropTypes.string
 }

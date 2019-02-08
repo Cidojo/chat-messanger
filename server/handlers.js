@@ -16,6 +16,13 @@ const getFormattedMessage = (text, type) => {
 
 const makeHandlers = (io, client, clientManager, roomManager) => {
 
+  const updateMembersList = (room) => {
+    io.to(room.name).emit(`refresh:room`, room.getMembersList());
+  }
+
+  const updateGlobalUsersList = () => {
+    io.emit(`refresh:global`, clientManager.getRegisteredClientsList());
+  }
 
   const handleRegister = (name, cb) => {
     try {
@@ -35,6 +42,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
     const newUserFormattedMessage = getFormattedMessage(`User ${name} joined global chat...`, MessageType.SYSTEM);
     client.broadcast.emit(`message:new-user`, newUserFormattedMessage);
+    updateGlobalUsersList();
   }
 
 
@@ -74,14 +82,16 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
     room.addMember(clientManager.getClientByName(invited));
     cb(room.getProps());
+    updateMembersList(room);
   }
 
 
   const handleDisconnect = () => {
     clientManager.getClientById(client.id).rooms.forEach((room) => {
       room.deleteMember(client.id);
+      updateMembersList(room);
     });
-
+    updateGlobalUsersList();
     clientManager.deleteClient(client.id);
 
     console.log(`${client.id} has disconnected...`); // eslint-disable-line

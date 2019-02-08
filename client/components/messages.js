@@ -10,7 +10,7 @@ class Messages extends React.Component {
 
   render() {
       // Loop through all the messages in the state and create a Message component
-      const messages = this.props.messages.slice(0).map((message, i) => {
+      const messages = this.props.messages.map((message, i) => {
           return (
             <Message
               key={i}

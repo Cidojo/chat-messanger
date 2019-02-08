@@ -11,11 +11,11 @@ const initSocketCli = () => {
     client.emit(`message:post`, roomName, text);
   }
 
-  const refreshGlobal = (cb) => {
+  const onUpdateGlobalUsersList = (cb) => {
     client.on(`refresh:global`, cb);
   }
 
-  const refreshRoom = (cb) => {
+  const onUpdateMembersList = (cb) => {
     client.on(`refresh:room`, cb);
   }
 
@@ -31,7 +31,7 @@ const initSocketCli = () => {
     });
   }
 
-  const getGlobalUserList = (cb) => {
+  const getGlobalUsersList = (cb) => {
     client.emit(`users:get`, cb);
   }
 
@@ -53,29 +53,19 @@ const initSocketCli = () => {
     });
   }
 
-  const enterRoom = (cb) => {
-    client.on(`enterRoom`, cb);
-  }
-
-  const onServerData = (cb) => {
-    client.on(`server-data:fetch`, cb);
-  }
-
   return {
     client,
-    getGlobalUserList,
+    getGlobalUsersList,
     invite,
     registerName,
     postMessage,
     onGetMessage,
-    refreshGlobal,
-    refreshRoom,
-    enterRoom,
+    onUpdateGlobalUsersList,
+    onUpdateMembersList,
     onNewUser,
     onInvitationAccept,
     onInvite,
-    fetchRoom,
-    onServerData
+    fetchRoom
   }
 }
 
