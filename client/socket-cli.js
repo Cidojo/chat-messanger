@@ -20,7 +20,7 @@ const initSocketCli = () => {
   }
 
   const onNewUser = (cb) => {
-    client.on(`message:new-user`, (message) => {
+    client.on(`message:userlist-change`, (message) => {
       cb(null, message);
     });
   }

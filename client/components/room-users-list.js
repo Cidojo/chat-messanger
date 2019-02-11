@@ -7,15 +7,10 @@ import './room-users-list.css';
 class RoomUsersList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      members: this.props.members
-    }
-
-    this.updateList = this.updateList.bind(this);
   }
 
   render() {
-    const members = this.props.members.slice(0).map((member, i) => {
+    const members = this.props.members.map((member, i) => {
       return (
         <li
         key={i}
@@ -32,11 +27,6 @@ class RoomUsersList extends React.Component {
         {members}
       </ul>
     );
-  }
-
-
-  updateList(list) {
-    this.setState({members: list});
   }
 }
 
