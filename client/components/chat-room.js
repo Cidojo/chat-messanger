@@ -14,12 +14,12 @@ class ChatRoom extends React.Component {
 
     this.state = {
       username: this.props.location.username,
-      currentRoom: this.props.location.initialRoom,
+      currentRoom: this.props.location.room,
       globalUsersList: []
     };
 
     this.roomManager = new RoomManager();
-    this.roomManager.addRoom(this.props.location.initialRoom);
+    this.roomManager.addRoom(this.props.location.room);
 
     this.onUpdateMembersList = this.onUpdateMembersList.bind(this);
     this.onUpdateGlobalUsersList = this.onUpdateGlobalUsersList.bind(this);

@@ -1,9 +1,8 @@
 class Room {
-  constructor(id, name) {
+  constructor(name) {
     this.name = name;
     this.members = new Map();
     this.chatHistory = [];
-    this.id = id;
   }
 
   getProps() {

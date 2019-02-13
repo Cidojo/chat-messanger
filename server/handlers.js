@@ -24,20 +24,14 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     client.broadcast.emit(`refresh:global`, clientManager.getRegisteredClientsList());
   }
 
-  const handleRegister = (name, cb) => {
+  const handleRegister = (name, roomName, cb) => {
     try {
       clientManager.registerClient(client.id, name);
-      if (roomManager.getRoomByName(name)) {
-        throw new Error(`cant take name of active room name`);
-      }
     } catch (e) {
       cb(false);
     }
-    // for simplicity room name & id equals to user's name & id
-    const roomName = name;
-    const roomID = client.id;
 
-    const room = roomManager.addRoom(roomID, roomName);
+    const room = roomName ? roomManager.add(roomName) : roomManager.getDefault();
     room.addMember(clientManager.getClientById(client.id));
     clientManager.addRoomToClient(client.id, room);
 
@@ -50,7 +44,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
 
   const handlePostMessage = (roomName, text) => {
-    const room = roomManager.getRoomByName(roomName);
+    const room = roomManager.getByName(roomName);
     const formattedMessage = getFormattedMessage(text, MessageType.USER);
 
     formattedMessage.from = clientManager.getClientById(client.id).name;
@@ -66,7 +60,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
   }
 
   const handleFetchRoom = (roomName, cb) => {
-    cb(roomManager.getRoomByName(roomName).getProps());
+    cb(roomManager.getByName(roomName).getProps());
   }
 
 
@@ -84,7 +78,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     const user = clientManager.getClientByName(invited);
     // const onUserJoinFormattedMessage = getFormattedMessage(`User ${user.name} has joined the room...`, MessageType.SYSTEM);
 
-    const room = roomManager.getRoomByName(host);
+    const room = roomManager.getByName(host);
 
     room.addMember(user);
     cb(room.getProps());
@@ -99,11 +93,9 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
     user.rooms.forEach((room) => {
       room.deleteMember(client.id);
-      console.log(`After deletion: ${[...room.members.values()]}`);
 
-      if (!room.members.size) {
-        roomManager.deleteRoom(room.id);
-        console.log(`All rooms ${roomManager.getRooms()}`)
+      if (!room.members.size && room.name !== roomManager.getDefault().name) {
+        roomManager.delete(room.name);
       }
 
       updateMembersList(room);

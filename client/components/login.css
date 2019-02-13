@@ -21,7 +21,8 @@
   text-align: center;
 }
 
-.username-form__input {
+.username-form__input,
+.username-form__chatname {
   width: 220px;
   height: 30px;
   margin: 30px auto 0;

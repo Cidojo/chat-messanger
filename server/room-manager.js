@@ -1,36 +1,38 @@
 const Room = require('./room.js');
 
+const defaultRoomName = `Global`;
 
 class RoomManager {
   constructor() {
     this.rooms = new Map();
+
+    this.add(defaultRoomName);
   }
 
-  addRoom(id, name) {
-    const room = new Room(id, name);
-    this.rooms.set(id, room);
+  add(name) {
+    if (this.rooms.has(name)) {
+      return this.rooms.get(name);
+    }
+
+    const room = new Room(name);
+    this.rooms.set(name, room);
 
     return room;
   }
 
-  deleteRoom(id) {
-    this.rooms.delete(id);
+  delete(name) {
+    this.rooms.delete(name);
   }
 
-  getRoomByName(roomName) {
-    let roomsIterMap = this.rooms.values();
-
-    for (let i = 0; i < this.rooms.size; i++) {
-      let current = roomsIterMap.next().value;
-
-      if (current.name === roomName) {
-        return current;
-      }
-
-    }
+  getByName(name) {
+    return this.rooms.get(name);
   }
 
-  getRooms() {
+  getDefault() {
+    return this.rooms.get(defaultRoomName);
+  }
+
+  getAll() {
     return [...this.rooms.values()].map((room) => room.name);
   }
 }
