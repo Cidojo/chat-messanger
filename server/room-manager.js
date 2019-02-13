@@ -7,7 +7,7 @@ class RoomManager {
   }
 
   addRoom(id, name) {
-    const room = new Room(name);
+    const room = new Room(id, name);
     this.rooms.set(id, room);
 
     return room;
