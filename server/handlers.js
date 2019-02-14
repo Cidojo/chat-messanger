@@ -39,6 +39,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
     const newUserFormattedMessage = getFormattedMessage(`User ${name} joined global chat...`, MessageType.SYSTEM);
     client.broadcast.emit(`message:userlist-change`, newUserFormattedMessage);
+    updateMembersList(room);
     updateGlobalUsersList();
   }
 
@@ -86,6 +87,11 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     // user.client.broadcast.to(host).emit(`message:userlist-change`, onUserJoinFormattedMessage);
   }
 
+  const handleLeaveRoom = (roomName) => {
+    const room = roomManager.getByName(roomName);
+    room.deleteMember(client.id);
+    updateMembersList(room);
+  }
 
   const handleDisconnect = () => {
     const user = clientManager.getClientById(client.id);
@@ -116,7 +122,8 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     handlePostMessage,
     handleDisconnect,
     handleInvitationAccept,
-    handleFetchRoom
+    handleFetchRoom,
+    handleLeaveRoom
   }
 }
 

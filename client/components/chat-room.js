@@ -19,7 +19,7 @@ class ChatRoom extends React.Component {
     };
 
     this.roomManager = new RoomManager();
-    this.roomManager.addRoom(this.props.location.room);
+    this.roomManager.add(this.props.location.room);
 
     this.onUpdateMembersList = this.onUpdateMembersList.bind(this);
     this.onUpdateGlobalUsersList = this.onUpdateGlobalUsersList.bind(this);
@@ -43,7 +43,9 @@ class ChatRoom extends React.Component {
   }
 
   render() {
-    const toggleBar = this.roomManager.getRooms().map((room, i) => {
+    const userRooms = this.roomManager.getAll();
+
+    const toggleBar = userRooms.map((room, i) => {
         return (
           <li key={i} className="chat-room__toggle">
             <label>
@@ -57,6 +59,11 @@ class ChatRoom extends React.Component {
                 checked={this.state.currentRoom.name === room.name}
               />
             </label>
+            {userRooms.length > 1 ?
+            <button onClick={this.leaveRoom.bind(this, room.name)}>x</button>
+            :
+            ``
+            }
           </li>
         )
       });
@@ -101,7 +108,19 @@ class ChatRoom extends React.Component {
       }
     });
 
-    this.roomManager.getRoom(roomName).chatHistory.push(message);
+    const room = this.roomManager.getByName(roomName);
+    if (room) {
+      room.chatHistory.push(message);
+    }
+  }
+
+  leaveRoom(roomName) {
+    this.roomManager.delete(roomName);
+
+    const currentRooms = this.roomManager.getAll();
+
+    this.changeRoom(currentRooms[currentRooms.length - 1].name);
+    this.socketCli.leaveRoom(roomName);
   }
 
   onUpdateMembersList(list) {
@@ -112,7 +131,7 @@ class ChatRoom extends React.Component {
       }
     });
 
-    this.roomManager.getRoom(this.state.currentRoom.name).members = list;
+    this.roomManager.getByName(this.state.currentRoom.name).members = list;
   }
 
   onUpdateGlobalUsersList(list) {
@@ -125,7 +144,7 @@ class ChatRoom extends React.Component {
 
   onInvitationAccept(e) {
     const onAccept = (room) => {
-      this.roomManager.addRoom(room);
+      this.roomManager.add(room);
       this.changeRoom(room.name);
     }
 
@@ -133,11 +152,11 @@ class ChatRoom extends React.Component {
   }
 
   changeRoom(roomName) {
-    const room = this.roomManager.getRoom(roomName);
+    const room = this.roomManager.getByName(roomName);
 
     this.setState({
       currentRoom: room,
-      messages: room.chatHistory
+      messages: room ? room.chatHistory : ``
     });
   }
 }

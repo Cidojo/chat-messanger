@@ -1,22 +1,27 @@
 class RoomManager {
   constructor() {
-    this.rooms = new Set();
+    this.rooms = new Map();
   }
 
-  addRoom(room) {
-    this.rooms.add(room);
+  add(room) {
+    if (this.rooms.has(room.name)) {
+      return this.rooms.get(room.name);
+    }
+
+    this.rooms.set(room.name, room);
+    return room;
   }
 
-  getRooms() {
-    return [...this.rooms];
+  getAll() {
+    return [...this.rooms.values()];
   }
 
-  getRoom(roomName) {
-    return this.getRooms().find((room) => room.name === roomName);
+  getByName(roomName) {
+    return this.rooms.get(roomName);
   }
 
-  deleteRoom(roomName) {
-    this.rooms.delete(this.getRoom(roomName));
+  delete(roomName) {
+    this.rooms.delete(roomName);
   }
 }
 

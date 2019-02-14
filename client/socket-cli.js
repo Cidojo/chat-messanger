@@ -47,6 +47,10 @@ const initSocketCli = () => {
     client.emit(`invite:accept`, host, guest, cb);
   }
 
+  const leaveRoom = (roomName) => {
+    client.emit(`room:leave`, roomName);
+  }
+
   const onInvite = (cb) => {
     client.on(`invite:query`, (message) => {
       cb(null, message);
@@ -65,7 +69,8 @@ const initSocketCli = () => {
     onNewUser,
     onInvitationAccept,
     onInvite,
-    fetchRoom
+    fetchRoom,
+    leaveRoom
   }
 }
 
