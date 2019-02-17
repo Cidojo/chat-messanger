@@ -33,6 +33,7 @@ class Login extends React.Component {
           username: this.state.username,
           chatname: this.state.chatname,
           room: this.state.room,
+          globalUsersList: this.state.globalUsersList,
           socketCli: this.socketCli
       }} />;
     }
@@ -78,11 +79,12 @@ class Login extends React.Component {
   usernameSubmitHandler(evt) {
     evt.preventDefault();
 
-    const onRegisterAnswer = (nameAvailiabilityState, room) => {
+    const onRegisterAnswer = (nameAvailiabilityState, room, globalUsersList) => {
       if (nameAvailiabilityState) {
         this.setState({
           registered: true,
-          room
+          room,
+          globalUsersList
         });
       } else {
         this.setState({

@@ -15,7 +15,7 @@ class Messages extends React.Component {
             <Message
               key={i}
               message={message}
-              onInvitationAccept={this.props.onInvitationAccept}
+              acceptInvite={this.props.acceptInvite}
             />
           );
         });
@@ -36,7 +36,7 @@ class Messages extends React.Component {
 
 Messages.propTypes = {
   messages: PropTypes.array,
-  onInvitationAccept: PropTypes.func
+  acceptInvite: PropTypes.func
 }
 
 export default Messages;

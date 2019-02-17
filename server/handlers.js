@@ -17,12 +17,14 @@ const getFormattedMessage = (text, type) => {
 const makeHandlers = (io, client, clientManager, roomManager) => {
 
   const updateMembersList = (room) => {
-    client.broadcast.to(room.name).emit(`refresh:room`, room.getMembersList());
+    client.broadcast.to(room.name).emit(`room:update-members`, room.getMembersList());
   }
 
+
   const updateGlobalUsersList = () => {
-    client.broadcast.emit(`refresh:global`, clientManager.getRegisteredClientsList());
+    client.broadcast.emit(`global:update-users`, clientManager.getRegisteredClientsList());
   }
+
 
   const handleRegister = (name, roomName, cb) => {
     try {
@@ -35,7 +37,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     room.addMember(clientManager.getClientById(client.id));
     clientManager.addRoomToClient(client.id, room);
 
-    cb(true, room.getProps());
+    cb(true, room.getProps(), clientManager.getRegisteredClientsList());
 
     const newUserFormattedMessage = getFormattedMessage(`User ${name} joined global chat...`, MessageType.SYSTEM);
     client.broadcast.emit(`message:userlist-change`, newUserFormattedMessage);
@@ -53,15 +55,6 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     room.addEntry(formattedMessage);
 
     io.to(roomName).emit(`message:get`, roomName, formattedMessage);
-  }
-
-
-  const handleGetUsers = (cb) => {
-    cb(clientManager.getRegisteredClientsList());
-  }
-
-  const handleFetchRoom = (roomName, cb) => {
-    cb(roomManager.getByName(roomName).getProps());
   }
 
 
@@ -87,11 +80,13 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     // user.client.broadcast.to(host).emit(`message:userlist-change`, onUserJoinFormattedMessage);
   }
 
+
   const handleLeaveRoom = (roomName) => {
     const room = roomManager.getByName(roomName);
     room.deleteMember(client.id);
     updateMembersList(room);
   }
+
 
   const handleDisconnect = () => {
     const user = clientManager.getClientById(client.id);
@@ -115,14 +110,13 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     console.log(`${client.id} has disconnected...`); // eslint-disable-line
   }
 
+
   return {
     handleRegister,
-    handleGetUsers,
     handleInviteEmit,
     handlePostMessage,
     handleDisconnect,
     handleInvitationAccept,
-    handleFetchRoom,
     handleLeaveRoom
   }
 }

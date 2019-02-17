@@ -18,7 +18,7 @@ class Message extends React.Component {
             {this.props.message.text}
           </span>
           {this.props.message.host ?
-            <button onClick={this.props.onInvitationAccept} value={this.props.message.host} >Accept</button> :
+            <button onClick={this.props.acceptInvite} value={this.props.message.host} >Accept</button> :
           ``
           }
         </li>
@@ -28,7 +28,7 @@ class Message extends React.Component {
 
   Message.propTypes = {
     message: PropTypes.object,
-    onInvitationAccept: PropTypes.func
+    acceptInvite: PropTypes.func
   }
 
   export default Message;
