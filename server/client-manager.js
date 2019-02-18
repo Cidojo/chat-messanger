@@ -35,6 +35,10 @@ class ClientManager {
     this.getClientById(id).rooms.add(room);
   }
 
+  deleteRoomFromClient(id, room) {
+    this.getClientById(id).rooms.delete(room);
+  }
+
   getAllClients() {
     return [...this.allClients.values()];
   }

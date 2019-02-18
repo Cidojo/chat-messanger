@@ -23,17 +23,14 @@ const initSocketCli = () => {
     client.emit(`room:leave`, roomName);
   }
 
-  const onUpdateGlobalUsersList = (cb) => {
+  const onChangeGlobalUsersList = (cb) => {
     client.on(`global:update-users`, cb);
   }
 
-  const onUpdateMembersList = (cb) => {
-    client.on(`room:update-members`, cb);
-  }
-
-  const onNewUser = (cb) => {
-    client.on(`message:userlist-change`, (message) => {
-      cb(null, message);
+  const onChangeMembersList = (listHandler, messageHandler) => {
+    client.on(`room:update-members`, (list, message) => {
+      listHandler(list);
+      messageHandler(null, message);
     });
   }
 
@@ -55,9 +52,8 @@ const initSocketCli = () => {
     registerName,
     postMessage,
     onGetMessage,
-    onUpdateGlobalUsersList,
-    onUpdateMembersList,
-    onNewUser,
+    onChangeGlobalUsersList,
+    onChangeMembersList,
     acceptInvite,
     onInvitation,
     leaveRoom

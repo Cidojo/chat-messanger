@@ -16,12 +16,14 @@ const getFormattedMessage = (text, type) => {
 
 const makeHandlers = (io, client, clientManager, roomManager) => {
 
-  const updateMembersList = (room) => {
-    client.broadcast.to(room.name).emit(`room:update-members`, room.getMembersList());
+  const onMembersListChange = (member, room) => {
+    const event = room.members.has(member.id) ? `join` : `left`;
+    const formattedMessage = getFormattedMessage(`User ${member.name} has ${event} the room...`, MessageType.SYSTEM);
+
+    client.broadcast.to(room.name).emit(`room:update-members`, room.getMembersList(), formattedMessage);
   }
 
-
-  const updateGlobalUsersList = () => {
+  const changeGlobalUsersList = () => {
     client.broadcast.emit(`global:update-users`, clientManager.getRegisteredClientsList());
   }
 
@@ -33,16 +35,16 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
       cb(false);
     }
 
+    const user = clientManager.getClientById(client.id);
     const room = roomName ? roomManager.add(roomName) : roomManager.getDefault();
-    room.addMember(clientManager.getClientById(client.id));
-    clientManager.addRoomToClient(client.id, room);
+
+    room.addMember(user);
+    clientManager.addRoomToClient(user.id, room);
 
     cb(true, room.getProps(), clientManager.getRegisteredClientsList());
 
-    const newUserFormattedMessage = getFormattedMessage(`User ${name} joined global chat...`, MessageType.SYSTEM);
-    client.broadcast.emit(`message:userlist-change`, newUserFormattedMessage);
-    updateMembersList(room);
-    updateGlobalUsersList();
+    onMembersListChange(user, room);
+    changeGlobalUsersList();
   }
 
 
@@ -70,43 +72,45 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
 
   const handleInvitationAccept = (host, invited, cb) => {
     const user = clientManager.getClientByName(invited);
-    // const onUserJoinFormattedMessage = getFormattedMessage(`User ${user.name} has joined the room...`, MessageType.SYSTEM);
-
     const room = roomManager.getByName(host);
 
     room.addMember(user);
+    clientManager.addRoomToClient(user.id, room);
+
     cb(room.getProps());
-    updateMembersList(room);
-    // user.client.broadcast.to(host).emit(`message:userlist-change`, onUserJoinFormattedMessage);
+
+    onMembersListChange(user, room);
   }
 
 
   const handleLeaveRoom = (roomName) => {
+    const user = clientManager.getClientById(client.id);
     const room = roomManager.getByName(roomName);
-    room.deleteMember(client.id);
-    updateMembersList(room);
+
+    clientManager.deleteRoomFromClient(client.id, room);
+
+    room.deleteMember(user.id);
+
+    onMembersListChange(user, room);
   }
 
 
   const handleDisconnect = () => {
     const user = clientManager.getClientById(client.id);
-    const onUserLeftFormattedMessage = getFormattedMessage(`User ${user.name} has left the room...`, MessageType.SYSTEM);
 
     user.rooms.forEach((room) => {
       room.deleteMember(client.id);
 
       if (!room.members.size && room.name !== roomManager.getDefault().name) {
         roomManager.delete(room.name);
+      } else {
+        onMembersListChange(user, room);
       }
-
-      updateMembersList(room);
-
-      client.broadcast.to(room.name).emit(`message:userlist-change`, onUserLeftFormattedMessage);
     });
 
     clientManager.deleteClient(client.id);
-    updateGlobalUsersList();
 
+    changeGlobalUsersList();
     console.log(`${client.id} has disconnected...`); // eslint-disable-line
   }
 
