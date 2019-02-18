@@ -12,7 +12,7 @@ const socketHandler = (io) => {
       handleInviteEmit,
       handlePostMessage,
       handleDisconnect,
-      handleInvitationAccept,
+      handleJoinRoom,
       handleLeaveRoom,
       handleFetchRoom
     } = makeHandlers(io, client, clientManager, roomManager);
@@ -25,7 +25,7 @@ const socketHandler = (io) => {
 
     client.on(`invite:emit`, handleInviteEmit);
 
-    client.on(`invite:accept`, handleInvitationAccept);
+    client.on(`room:join`, handleJoinRoom);
 
     client.on(`message:post`, handlePostMessage);
 

@@ -49,7 +49,7 @@ class ChangeRoomDialog extends React.Component {
   submitHandler(e) {
     e.preventDefault();
 
-    this.props.changeRoomHandler(this.state.roomName);
+    this.props.joinRoomHandler(this.state.roomName);
   }
 
   openDialog() {
@@ -58,7 +58,7 @@ class ChangeRoomDialog extends React.Component {
 }
 
 ChangeRoomDialog.propTypes = {
-  changeRoomHandler: PropTypes.func
+  joinRoomHandler: PropTypes.func
 }
 
 export default ChangeRoomDialog;

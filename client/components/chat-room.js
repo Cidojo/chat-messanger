@@ -29,10 +29,11 @@ class ChatRoom extends React.Component {
     this.getUserMessage = this.getUserMessage.bind(this);
 
     this.handleInvite = this.handleInvite.bind(this);
-    this.changeRoom = this.changeRoom.bind(this);
+    this.switchRoom = this.switchRoom.bind(this);
     this.handleChatScreenToggle = this.handleChatScreenToggle.bind(this);
     this.acceptInvite = this.acceptInvite.bind(this);
     this.fetchRoom = this.fetchRoom.bind(this);
+    this.joinRoom = this.joinRoom.bind(this);
 
 
     this.socketCli = this.props.location.socketCli;
@@ -87,13 +88,13 @@ class ChatRoom extends React.Component {
           </ul>
         </div>
         <GlobalUsersList globalUsersList={this.state.globalUsersList} self={this.state.username} handleInvite={this.handleInvite} />
-        <ChangeRoomDialog changeRoomHandler={this.changeRoom} />
+        <ChangeRoomDialog joinRoomHandler={this.joinRoom} />
       </div>
     );
   }
 
   handleChatScreenToggle(e) {
-    this.changeRoom(e.target.value);
+    this.switchRoom(e.target.value);
   }
 
   postMessage(message) {
@@ -121,7 +122,7 @@ class ChatRoom extends React.Component {
 
     const currentRooms = this.roomManager.getAll();
 
-    this.changeRoom(currentRooms[currentRooms.length - 1].name);
+    this.switchRoom(currentRooms[currentRooms.length - 1].name);
     this.socketCli.leaveRoom(roomName);
   }
 
@@ -145,22 +146,11 @@ class ChatRoom extends React.Component {
   }
 
   acceptInvite(e) {
-    const fetch = () => {
-      return new Promise ((res) => {
-        if (this.roomManager.rooms.has(e.target.value)) {
-          res(e.target.value);
-        } else {
-          const accept = (room) => {
-            this.roomManager.add(room);
-            res(room.name);
-          }
-
-          this.socketCli.acceptInvite(e.target.value, this.state.username, accept.bind(this));
-        }
-      });
+    if (this.roomManager.rooms.has(e.target.value)) {
+      this.switchRoom(e.target.value);
+    } else {
+      this.joinRoom(e.target.value);
     }
-
-    fetch().then(this.changeRoom);
   }
 
   fetchRoom(roomName) {
@@ -169,15 +159,25 @@ class ChatRoom extends React.Component {
     });
   }
 
-  changeRoom(roomName) {
-    this.fetchRoom(roomName).then((room) => {
-      this.roomManager.add(room);
+  switchRoom(roomName) {
+    const room = this.roomManager.getByName(roomName);
 
-      this.setState({
-        currentRoom: room,
-        messages: room ? room.chatHistory : ``
-      });
-    })
+    this.setState({
+      currentRoom: room,
+      messages: room.chatHistory
+    });
+  }
+
+  joinRoom(roomName) {
+    this.socketCli.joinRoom(roomName, this.state.username, () => {
+
+      this.fetchRoom(roomName)
+        .then((room) => this.roomManager.add(room))
+        .then((room) => {
+          this.switchRoom(room.name);
+        })
+        .catch((e) => console.log(e));
+    });
   }
 }
 

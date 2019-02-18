@@ -70,14 +70,14 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
   }
 
 
-  const handleInvitationAccept = (host, invited, cb) => {
-    const user = clientManager.getClientByName(invited);
-    const room = roomManager.getByName(host);
+  const handleJoinRoom = (roomName, username, cb) => {
+    const user = clientManager.getClientByName(username);
+    const room = roomManager.add(roomName);
 
     room.addMember(user);
     clientManager.addRoomToClient(user.id, room);
 
-    cb(room.getProps());
+    cb();
 
     onMembersListChange(user, room);
   }
@@ -126,7 +126,7 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     handleInviteEmit,
     handlePostMessage,
     handleDisconnect,
-    handleInvitationAccept,
+    handleJoinRoom,
     handleLeaveRoom,
     handleFetchRoom
   }
