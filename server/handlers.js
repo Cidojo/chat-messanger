@@ -95,6 +95,12 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
   }
 
 
+  const handleFetchRoom = (roomName, cb) => {
+    const room = roomManager.add(roomName).getProps();
+    cb(room);
+  }
+
+
   const handleDisconnect = () => {
     const user = clientManager.getClientById(client.id);
 
@@ -121,7 +127,8 @@ const makeHandlers = (io, client, clientManager, roomManager) => {
     handlePostMessage,
     handleDisconnect,
     handleInvitationAccept,
-    handleLeaveRoom
+    handleLeaveRoom,
+    handleFetchRoom
   }
 }
 

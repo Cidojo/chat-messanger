@@ -4,6 +4,7 @@ import Messages from './messages';
 import ChatInput from './chat-input';
 import RoomUsersList from './room-users-list';
 import GlobalUsersList from './global-users-list';
+import ChangeRoomDialog from './change-room-dialog';
 import RoomManager from './../room-manager';
 import './chat-room.css';
 
@@ -31,6 +32,7 @@ class ChatRoom extends React.Component {
     this.changeRoom = this.changeRoom.bind(this);
     this.handleChatScreenToggle = this.handleChatScreenToggle.bind(this);
     this.acceptInvite = this.acceptInvite.bind(this);
+    this.fetchRoom = this.fetchRoom.bind(this);
 
 
     this.socketCli = this.props.location.socketCli;
@@ -74,6 +76,7 @@ class ChatRoom extends React.Component {
         <div className="chat-room__window">
           <ul className="chat-room__list">
             <li className={`chat-room__item`}>
+              <span>logged as {this.state.username}</span>
               <h3 className="chat-room__title">Chat Room: {this.state.currentRoom.name}</h3>
               <div className="chat-room__container">
                 <Messages messages={this.state.currentRoom.chatHistory} acceptInvite={this.acceptInvite} />
@@ -84,6 +87,7 @@ class ChatRoom extends React.Component {
           </ul>
         </div>
         <GlobalUsersList globalUsersList={this.state.globalUsersList} self={this.state.username} handleInvite={this.handleInvite} />
+        <ChangeRoomDialog changeRoomHandler={this.changeRoom} />
       </div>
     );
   }
@@ -159,13 +163,21 @@ class ChatRoom extends React.Component {
     fetch().then(this.changeRoom);
   }
 
-  changeRoom(roomName) {
-    const room = this.roomManager.getByName(roomName);
-
-    this.setState({
-      currentRoom: room,
-      messages: room ? room.chatHistory : ``
+  fetchRoom(roomName) {
+    return new Promise((resolve) => {
+      this.socketCli.fetchRoom(roomName, resolve);
     });
+  }
+
+  changeRoom(roomName) {
+    this.fetchRoom(roomName).then((room) => {
+      this.roomManager.add(room);
+
+      this.setState({
+        currentRoom: room,
+        messages: room ? room.chatHistory : ``
+      });
+    })
   }
 }
 
