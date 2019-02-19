@@ -50,6 +50,8 @@ class ChangeRoomDialog extends React.Component {
     e.preventDefault();
 
     this.props.joinRoomHandler(this.state.roomName);
+
+    e.target.value = ``;
   }
 
   openDialog() {

@@ -103,17 +103,16 @@ class ChatRoom extends React.Component {
 
   getUserMessage(roomName, message) {
     const room = this.roomManager.getByName(roomName) || this.state.currentRoom;
+    room.chatHistory.push(message);
 
     if (room.name === this.state.currentRoom.name) {
       this.setState({
         currentRoom: {
           ...this.state.currentRoom,
-          chatHistory: [...this.state.currentRoom.chatHistory, message]
+          chatHistory: room.chatHistory
         }
       });
     }
-
-    room.chatHistory.push(message);
   }
 
   leaveRoom(roomName) {
