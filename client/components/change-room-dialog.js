@@ -17,22 +17,16 @@ class ChangeRoomDialog extends React.Component {
   render() {
     return (
       <div>
-        <button
-          className="change-room-dialog__toggle"
-          onClick={this.openDialog}
-        >
-          Change Room
-        </button>
+        <button className="change-room-dialog__toggle" onClick={this.openDialog}>Change Room</button>
         <div className="change-room-dialog">
           <form onSubmit={this.submitHandler}>
-            <input
+            <input className="chat-input"
               type="text"
-              placeholder="enter room name you wish to create..."
               onChange={this.changeHandler}
-            />
-            <button>
-              Create
-            </button>
+              value={this.state.roomName}
+              placeholder="enter room name you wish to create..."
+              required />
+            <button>Create</button>
           </form>
           <ul className="change-room-dialog__availiable"></ul>
         </div>
@@ -51,7 +45,7 @@ class ChangeRoomDialog extends React.Component {
 
     this.props.joinRoomHandler(this.state.roomName);
 
-    e.target.value = ``;
+    this.setState({roomName: ``});
   }
 
   openDialog() {

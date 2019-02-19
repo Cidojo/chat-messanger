@@ -35,8 +35,13 @@ app.use(webpackDevMiddleware(compiler, {
 app.use(express.static(publicPath));
 
 
-app.get(`*`, (req, res) => {
-  res.sendFile(path.join(publicPath, `index.html`));
+app.get(`/*`, (req, res) => {
+  res.redirect(`/`);
 });
+
+// app.get(`*`, (req, res) => {
+//   res.sendFile(path.join(publicPath, `index.html`));
+// });
+
 
 socketHandler(io);

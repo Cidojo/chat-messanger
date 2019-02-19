@@ -28,7 +28,7 @@ class Login extends React.Component {
 
   render() {
     if (this.state.registered) {
-      return <Redirect to={{
+      return <Redirect push to={{
           pathname: `/chatroom`,
           username: this.state.username,
           chatname: this.state.chatname,

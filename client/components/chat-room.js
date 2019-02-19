@@ -174,13 +174,14 @@ class ChatRoom extends React.Component {
         .then((room) => {
           this.switchRoom(room.name);
         })
-        .catch((e) => console.log(e));
+        .catch((e) => console.log(e)); // eslint-disable-line
     });
   }
 }
 
 ChatRoom.propTypes = {
-  location: PropTypes.any
+  location: PropTypes.any,
+  history: PropTypes.any
 }
 
 export default ChatRoom;
